@@ -1,0 +1,189 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: openplotter\n"
+"POT-Creation-Date: 2020-03-15 22:19+0100\n"
+"PO-Revision-Date: 2020-03-15 22:32+0100\n"
+"Last-Translator: e-sailing <e.minus.sailing@gmail.com>\n"
+"Language-Team: German\n"
+"Language: de\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 2.3\n"
+"X-Poedit-Basepath: ../../..\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Poedit-SourceCharset: UTF-8\n"
+"X-Crowdin-Project: openplotter\n"
+"X-Crowdin-Language: de\n"
+"X-Crowdin-File: openplotter-avnav.po\n"
+"X-Poedit-SearchPath-0: .\n"
+
+#: data/openplotter-avnav.desktop:3
+msgid "Avnav"
+msgstr "Avnav"
+
+#: data/openplotter-avnav.desktop:5
+msgid "sailboat24r"
+msgstr "x"
+
+#: installAvnav.py:31
+msgid "Install app..."
+msgstr "Installiere Anwendung..."
+
+#: installAvnav.py:39 installAvnav.py:63 installAvnav.py:72
+#: uninstallAvnav.py:38
+msgid "DONE"
+msgstr "FERTIG"
+
+#: installAvnav.py:40 installAvnav.py:64 installAvnav.py:73
+#: uninstallAvnav.py:39
+msgid "FAILED: "
+msgstr "FEHLGESCHLAGEN: "
+
+#: installAvnav.py:44
+msgid "Editing config files..."
+msgstr "Ändere Konfigurationsdateien..."
+
+#: installAvnav.py:66
+msgid "Setting version..."
+msgstr "Versionseintrag machen..."
+
+#: openplotterAvnav.py:75
+msgid "Help"
+msgstr "Hilfe"
+
+#: openplotterAvnav.py:78 openplotterAvnav.py:157
+msgid "Settings"
+msgstr "Einstellungen"
+
+#: openplotterAvnav.py:81
+msgid "Refresh"
+msgstr "Aktualisieren"
+
+#: openplotterAvnav.py:83
+msgid "Open Avnav"
+msgstr "Öffne Avnav"
+
+#: openplotterAvnav.py:90
+msgid "Apps"
+msgstr "Apps"
+
+#: openplotterAvnav.py:146 openplotterAvnav.py:215
+msgid "Please install \"Signal K Installer\" OpenPlotter app"
+msgstr "Bitte installiere \"Signal K Installer\" in der OpenPlotter App"
+
+#: openplotterAvnav.py:151
+msgid "Name"
+msgstr "Name"
+
+#: openplotterAvnav.py:152
+msgid "status"
+msgstr "status"
+
+#: openplotterAvnav.py:161
+msgid "Show"
+msgstr "Zeigen"
+
+#: openplotterAvnav.py:164
+msgid "Install"
+msgstr "Installieren"
+
+#: openplotterAvnav.py:166
+msgid "Uninstall"
+msgstr "Deinstallieren"
+
+#: openplotterAvnav.py:184
+msgid "installed"
+msgstr "installiert"
+
+#: openplotterAvnav.py:186
+msgid "not installed"
+msgstr "nicht installiert"
+
+#: openplotterAvnav.py:198
+msgid "This app can not be installed"
+msgstr "Diese Anwendung kann nicht installiert werden"
+
+#: openplotterAvnav.py:200
+msgid "Are you sure you want to install "
+msgstr "Bist Du sicher, dass Du die Installation starten möchten "
+
+#: openplotterAvnav.py:200 openplotterAvnav.py:227
+msgid " and its dependencies?"
+msgstr " und seine Abhängigkeiten?"
+
+#: openplotterAvnav.py:201 openplotterAvnav.py:228
+msgid "Question"
+msgstr "Frage"
+
+#: openplotterAvnav.py:209
+msgid "Installing Avnav, please wait... "
+msgstr "Avnav wird installiert, bitte warten... "
+
+#: openplotterAvnav.py:225
+msgid "This app can not be uninstalled"
+msgstr "Diese Anwendung kann nicht deinstalliert werden"
+
+#: openplotterAvnav.py:227
+msgid "Are you sure you want to uninstall "
+msgstr "Bist Du sicher, dass Du deinstallieren möchtest "
+
+#: openplotterAvnav.py:236
+msgid "Uninstalling Avnav, please wait... "
+msgstr "Deinstalliere Avnav, bitte warten... "
+
+#: openplotterAvnav.py:243
+msgid "Restarting Signal K server... "
+msgstr "Starte Signal K Server neu... "
+
+#: openplotterAvnav.py:248
+msgid "Signal K server restarted"
+msgstr "Signal K Server neu gestartet"
+
+#: openplotterAvnav.py:253
+msgid "Process management for"
+msgstr "Prozesseinstellungen für"
+
+#: openplotterAvnav.py:309
+msgid "Enable"
+msgstr "Aktiv"
+
+#: openplotterAvnav.py:309
+msgid "Disable"
+msgstr "Inaktiv"
+
+#: openplotterAvnav.py:314
+msgid "Start"
+msgstr "Start"
+
+#: openplotterAvnav.py:316
+msgid "Stop"
+msgstr "Stop"
+
+#: openplotterAvnav.py:318
+msgid "Restart"
+msgstr "Neustart"
+
+#~ msgid "Dashboards"
+#~ msgstr "Dashboards"
+
+#~ msgid "Edit"
+#~ msgstr "Ändern"
+
+#~ msgid "Checking Dashboards..."
+#~ msgstr "Dashboards werden überprüft..."
+
+#~ msgid "Node-Red is disabled. Please enable it in Signal K -> Server -> Plugin Config -> Node Red -> Active"
+#~ msgstr "Knoten-Rot ist deaktiviert. Bitte aktivieren Sie es unter Signal K -> Server -> Plugin Config -> Node Red -> Aktiv"
+
+#~ msgid "signalk-to-influxdb plugin is disabled. Please enable it in Signal K -> Server -> Plugin Config -> InfluxDb writer -> Active"
+#~ msgstr "Signalk-to-influxdb Plugin ist deaktiviert. Bitte aktivieren Sie es unter Signal K -> Server -> Plugin Config -> InfluxDb writer -> Aktiv"
+
+#~ msgid "Influxdb is not running"
+#~ msgstr "Influxdb läuft nicht"
+
+#~ msgid "Kapacitor is not running"
+#~ msgstr "Kapacitor läuft nicht"
+
+#~ msgid "Grafana is not running"
+#~ msgstr "Grafana läuft nicht"

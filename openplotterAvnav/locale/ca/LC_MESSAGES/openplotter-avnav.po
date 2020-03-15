@@ -1,0 +1,165 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: openplotter\n"
+"POT-Creation-Date: 2020-03-15 22:19+0100\n"
+"PO-Revision-Date: 2020-03-15 22:38+0100\n"
+"Last-Translator: e-sailing <e.minus.sailing@gmail.com>\n"
+"Language-Team: Catalan\n"
+"Language: ca\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 2.3\n"
+"X-Poedit-Basepath: ../../..\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Poedit-SourceCharset: UTF-8\n"
+"X-Crowdin-Project: openplotter\n"
+"X-Crowdin-Language: ca\n"
+"X-Crowdin-File: openplotter-avnav.po\n"
+"X-Poedit-SearchPath-0: .\n"
+
+#: data/openplotter-avnav.desktop:3
+msgid "Avnav"
+msgstr ""
+
+#: data/openplotter-avnav.desktop:5
+msgid "sailboat24r"
+msgstr ""
+
+#: installAvnav.py:31
+msgid "Install app..."
+msgstr ""
+
+#: installAvnav.py:39 installAvnav.py:63 installAvnav.py:72
+#: uninstallAvnav.py:38
+msgid "DONE"
+msgstr ""
+
+#: installAvnav.py:40 installAvnav.py:64 installAvnav.py:73
+#: uninstallAvnav.py:39
+msgid "FAILED: "
+msgstr ""
+
+#: installAvnav.py:44
+msgid "Editing config files..."
+msgstr ""
+
+#: installAvnav.py:66
+msgid "Setting version..."
+msgstr ""
+
+#: openplotterAvnav.py:75
+msgid "Help"
+msgstr ""
+
+#: openplotterAvnav.py:78 openplotterAvnav.py:157
+msgid "Settings"
+msgstr ""
+
+#: openplotterAvnav.py:81
+msgid "Refresh"
+msgstr ""
+
+#: openplotterAvnav.py:83
+msgid "Open Avnav"
+msgstr ""
+
+#: openplotterAvnav.py:90
+msgid "Apps"
+msgstr ""
+
+#: openplotterAvnav.py:146 openplotterAvnav.py:215
+msgid "Please install \"Signal K Installer\" OpenPlotter app"
+msgstr ""
+
+#: openplotterAvnav.py:151
+msgid "Name"
+msgstr ""
+
+#: openplotterAvnav.py:152
+msgid "status"
+msgstr ""
+
+#: openplotterAvnav.py:161
+msgid "Show"
+msgstr ""
+
+#: openplotterAvnav.py:164
+msgid "Install"
+msgstr ""
+
+#: openplotterAvnav.py:166
+msgid "Uninstall"
+msgstr ""
+
+#: openplotterAvnav.py:184
+msgid "installed"
+msgstr ""
+
+#: openplotterAvnav.py:186
+msgid "not installed"
+msgstr ""
+
+#: openplotterAvnav.py:198
+msgid "This app can not be installed"
+msgstr ""
+
+#: openplotterAvnav.py:200
+msgid "Are you sure you want to install "
+msgstr ""
+
+#: openplotterAvnav.py:200 openplotterAvnav.py:227
+msgid " and its dependencies?"
+msgstr ""
+
+#: openplotterAvnav.py:201 openplotterAvnav.py:228
+msgid "Question"
+msgstr ""
+
+#: openplotterAvnav.py:209
+msgid "Installing Avnav, please wait... "
+msgstr ""
+
+#: openplotterAvnav.py:225
+msgid "This app can not be uninstalled"
+msgstr ""
+
+#: openplotterAvnav.py:227
+msgid "Are you sure you want to uninstall "
+msgstr ""
+
+#: openplotterAvnav.py:236
+msgid "Uninstalling Avnav, please wait... "
+msgstr ""
+
+#: openplotterAvnav.py:243
+msgid "Restarting Signal K server... "
+msgstr ""
+
+#: openplotterAvnav.py:248
+msgid "Signal K server restarted"
+msgstr ""
+
+#: openplotterAvnav.py:253
+msgid "Process management for"
+msgstr ""
+
+#: openplotterAvnav.py:309
+msgid "Enable"
+msgstr ""
+
+#: openplotterAvnav.py:309
+msgid "Disable"
+msgstr ""
+
+#: openplotterAvnav.py:314
+msgid "Start"
+msgstr ""
+
+#: openplotterAvnav.py:316
+msgid "Stop"
+msgstr ""
+
+#: openplotterAvnav.py:318
+msgid "Restart"
+msgstr ""

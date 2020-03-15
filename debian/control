@@ -1,0 +1,15 @@
+Source: openplotter-avnav
+Section: misc
+Priority: optional
+Maintainer: e-sailing <e.minus.sailing@gmail.com>
+Build-Depends: debhelper (>=9),dh-python,python3-all,python3-setuptools
+Standards-Version: 3.9.6
+Homepage: https://github.com/openplotter/openplotter-avnav
+X-Python3-Version: >= 3.2
+
+Package: openplotter-avnav
+Architecture: all
+Multi-Arch: foreign
+Depends: ${misc:Depends}, ${python3:Depends}, openplotter-settings
+Description: OpenPltter app to manage avnav
+ OpenPltter app to manage avnav
