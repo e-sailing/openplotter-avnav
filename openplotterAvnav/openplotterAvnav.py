@@ -40,7 +40,6 @@ class MyFrame(wx.Frame):
 		install = ''
 		uninstall = ''
 		if self.platform.skPort:
-			#edit = self.platform.http+'localhost:'+self.platform.skPort+'/admin/#/serverConfiguration/plugins/signalk-to-influxdb'
 			install = self.platform.admin+' python3 '+self.currentdir+'/installAvnav.py'
 			uninstall = self.platform.admin+' python3 '+self.currentdir+'/uninstallAvnav.py'			
 		app = {
@@ -74,7 +73,6 @@ class MyFrame(wx.Frame):
 		self.toolbar1 = wx.ToolBar(self, style=wx.TB_TEXT)
 		toolHelp = self.toolbar1.AddTool(101, _('Help'), wx.Bitmap(self.currentdir+"/data/help.png"))
 		self.Bind(wx.EVT_TOOL, self.OnToolHelp, toolHelp)
-		if not self.platform.isInstalled('openplotter-doc'): self.toolbar1.EnableTool(101,False)
 		toolSettings = self.toolbar1.AddTool(106, _('Settings'), wx.Bitmap(self.currentdir+"/data/settings.png"))
 		self.Bind(wx.EVT_TOOL, self.OnToolSettings, toolSettings)
 		self.toolbar1.AddSeparator()
@@ -131,7 +129,7 @@ class MyFrame(wx.Frame):
 		except:pass
 
 	def OnToolHelp(self, event): 
-		url = "/usr/share/openplotter-doc/avnav/avnav_app.html"
+		url = "/usr/lib/python3/dist-packages/openplotterAvnav/data/help.html"
 		webbrowser.open(url, new=2)
 
 	def OnToolSettings(self, event=0): 
@@ -156,8 +154,6 @@ class MyFrame(wx.Frame):
 		self.toolbar2 = wx.ToolBar(self.apps, style=wx.TB_TEXT | wx.TB_VERTICAL)
 		self.settingsButton = self.toolbar2.AddTool(204, _('Settings'), wx.Bitmap(self.currentdir+"/data/settings2.png"))
 		self.Bind(wx.EVT_TOOL, self.OnSettingsButton, self.settingsButton)
-		#self.editButton = self.toolbar2.AddTool(201, _('Edit'), wx.Bitmap(self.currentdir+"/data/edit.png"))
-		#self.Bind(wx.EVT_TOOL, self.OnEditButton, self.editButton)
 		self.showButton = self.toolbar2.AddTool(202, _('Show'), wx.Bitmap(self.currentdir+"/data/show.png"))
 		self.Bind(wx.EVT_TOOL, self.OnShowButton, self.showButton)
 		self.toolbar2.AddSeparator()
@@ -252,9 +248,7 @@ class MyFrame(wx.Frame):
 		if index == -1: return
 		dlg = ProcessSetting(self,_('Process management for') + ' ' + self.appsDict[index]['name'] )
 		res = dlg.ShowModal()
-		if res == wx.ID_OK:
-			#webbrowser.open(apps[index]['edit'], new=2)
-			pass
+		dlg.Destroy()
 
 	def OnShowButton(self, e):
 		index = self.listApps.GetFirstSelected()
@@ -293,23 +287,35 @@ class MyFrame(wx.Frame):
 
 class ProcessSetting(wx.Dialog): 
 
-	#def __init__(self, parent, _('Process') + ' ' + processName + ' ' + _(management)'): 
-	def __init__(self, parent, title): 
+	def __init__(self, parent, title):
 		self.conf = conf.Conf()
 		self.platform = platform.Platform()
 		self.currentdir = os.path.dirname(os.path.abspath(__file__))
 		currentLanguage = self.conf.get('GENERAL', 'lang')
 		self.language = language.Language(self.currentdir,'openplotter-avnav',currentLanguage)
-		super(ProcessSetting, self).__init__(parent, title = title,size = (400,220)) 
-		self.InitUI() 
-		
-	def InitUI(self):    
-		pnl = wx.Panel(self)
-		
-		self.lblList = [_('Enable'),_('Disable')] 
 
-		self.rbox = wx.RadioBox(pnl, label = 'Autostart', choices = self.lblList, majorDimension = 1, style = wx.RA_SPECIFY_ROWS) 
+		wx.Dialog.__init__(self, None, title=title, size=(400,320))
+		pnl = wx.Panel(self)
+		pnl.SetBackgroundColour(wx.Colour(230,230,230,255))
+		
+		self.lblList = [_('Enable'),_('Disable')]
+
+		self.rbox = wx.RadioBox(pnl, label = 'Autostart', choices = self.lblList, majorDimension = 1, style = wx.RA_SPECIFY_ROWS)
 		self.rbox.Bind(wx.EVT_RADIOBOX,self.onRadioBox)
+
+		sbox = wx.StaticBox(pnl, -1, _('Status'))
+
+		self.aStatusList = [_('active'),_('inactive')]
+		self.aStatusbox = wx.RadioBox(pnl, label = _('ActiveState'), choices = self.aStatusList, majorDimension = 1, style = wx.RA_SPECIFY_ROWS)
+		self.aStatusbox.Enable(False)
+
+		self.bStatusList = [_('running'),_('dead')] 
+		self.bStatusbox = wx.RadioBox(pnl, label = _('Substate'), choices = self.bStatusList, majorDimension = 1, style = wx.RA_SPECIFY_ROWS)
+		self.bStatusbox.Enable(False)
+
+		statusSizer = wx.StaticBoxSizer(sbox, wx.VERTICAL)
+		statusSizer.Add(self.aStatusbox, 0, wx.ALL, 5)
+		statusSizer.Add(self.bStatusbox, 0, wx.ALL, 5)
 
 		self.start = wx.Button(pnl, label=_('Start'))
 		self.start.Bind(wx.EVT_BUTTON, self.onStart)
@@ -318,48 +324,54 @@ class ProcessSetting(wx.Dialog):
 		self.restart = wx.Button(pnl, label=_('Restart'))
 		self.restart.Bind(wx.EVT_BUTTON, self.onRestart)
 		
-		hbox = wx.BoxSizer(wx.VERTICAL)
-		hbox.Add(self.rbox, 0, wx.ALL, 5)
-		hbox.Add(self.start, 0, wx.ALL, 5)
-		hbox.Add(self.stop, 0, wx.ALL, 5)
-		hbox.Add(self.restart, 0, wx.ALL, 5)
-		
-		command = 'systemctl show avnav --no-page'
-		output = subprocess.check_output(command.split(),universal_newlines=True)
-		if 'UnitFileState=enabled' in output:
-			pass
-		else:
-			self.rbox.SetSelection(1)
-		
-		pnl.SetSizer(hbox)
+		hbox = wx.BoxSizer(wx.HORIZONTAL)
+		hbox.Add(self.rbox, 1, wx.ALL, 5)
+		hbox.AddStretchSpacer(1)
+		hbox.Add(statusSizer, 1, wx.ALL, 5)
+
+		vbox = wx.BoxSizer(wx.VERTICAL)
+		vbox.Add(hbox, 0, wx.ALL, 0)
+		vbox.AddStretchSpacer(1)
+		vbox.Add(self.start, 0, wx.LEFT | wx.BOTTOM, 5)
+		vbox.Add(self.stop, 0, wx.ALL, 5)
+		vbox.Add(self.restart, 0, wx.ALL, 5)
+		pnl.SetSizer(vbox)
+
+		self.statusUpdate()
 		
 		self.Centre() 
-		self.Show(True)    
-				
+		self.Show(True)
+
+	def statusUpdate(self): 
+		command = 'systemctl show avnav --no-page'
+		output = subprocess.check_output(command.split(),universal_newlines=True)
+		if 'UnitFileState=enabled' in output:	self.rbox.SetSelection(0)
+		else: 									self.rbox.SetSelection(1)
+		if 'ActiveState=active' in output:		self.aStatusbox.SetSelection(0)
+		else: 									self.aStatusbox.SetSelection(1)
+		if 'SubState=running' in output:		self.bStatusbox.SetSelection(0)
+		else: 									self.bStatusbox.SetSelection(1)
+
 	def onRadioBox(self,e): 
 		if self.lblList[0] == self.rbox.GetStringSelection():
 			subprocess.call(['systemctl', 'enable', 'avnav'])
 		else:
 			subprocess.call(['systemctl', 'stop', 'avnav'])
 			subprocess.call(['systemctl', 'disable', 'avnav'])
-		
+
 	def onStart(self,e):
 		subprocess.call(['systemctl', 'start', 'avnav'])
+		self.statusUpdate()
 
 	def onStop(self,e):
 		subprocess.call(['systemctl', 'stop', 'avnav'])
+		self.statusUpdate()
 
 	def onRestart(self,e):
 		subprocess.call(['systemctl', 'restart', 'avnav'])
+		self.statusUpdate()
 
 def main():
-	#try:
-	#	platform2 = platform.Platform()
-	#	if not platform2.postInstall(version,'avnav'):
-	#		subprocess.Popen(['openplotterPostInstall', platform2.admin+' avnavPostInstall'])
-	#		return
-	#except: pass
-
 	app = wx.App()
 	MyFrame().Show()
 	time.sleep(1)

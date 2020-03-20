@@ -62,7 +62,7 @@
  -->
 <!-- a tcp socket that will output all NMEA data that AvNav has received
      you can customize it using the filter -->
-<AVNSocketWriter port="34568" maxDevices="5" blacklist="signalk" filter="$RMB" read="true" minTime="50" name="tosignalk"/>
+<AVNSocketWriter port="28628" maxDevices="5" blackList="signalk" filter="" read="true" minTime="50" name="tosignalk"/>
 <!-- the following entries provide the integration with signalk and canboat
      we provide a connector to canboat (n2kd) to receive all data that has been translated from nmea2000 to nmea0183
      we provide an additional socket that will provide only the nmea data that has not been received from canboat
