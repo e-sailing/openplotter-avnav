@@ -1,6 +1,6 @@
 Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
 Upstream-Name: openplotter-avnav
-Source: https://github.com/openplotter/openplotter-avnav
+Source: https://github.com/e-sailing/openplotter-avnav
 
 Files: *
 Copyright: 2020 e-sailing <e.minus.sailing@gmail.com>

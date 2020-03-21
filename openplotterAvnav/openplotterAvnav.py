@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 
 # This file is part of Openplotter.
-# Copyright (C) 2020 by Sailoog <https://github.com/openplotter/openplotter-avnav>
-#                     e-sailing <https://github.com/e-sailing/openplotter>
+# Copyright (C) 2020 by Sailoog <https://github.com/openplotter>
+#                     e-sailing <https://github.com/e-sailing/openplotter-avnav>
 # Openplotter is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 2 of the License, or
@@ -21,6 +21,8 @@ import wx.richtext as rt
 from openplotterSettings import conf
 from openplotterSettings import language
 from openplotterSettings import platform
+from openplotterSignalkInstaller import editSettings
+
 if os.path.dirname(os.path.abspath(__file__))[0:4] == '/usr':
 	from .version import version
 else:
@@ -36,23 +38,10 @@ class MyFrame(wx.Frame):
 
 		self.appsDict = []
 
-		edit = ''
-		install = ''
-		uninstall = ''
 		if self.platform.skPort:
 			install = self.platform.admin+' python3 '+self.currentdir+'/installAvnav.py'
 			uninstall = self.platform.admin+' python3 '+self.currentdir+'/uninstallAvnav.py'			
-		app = {
-		'name': 'Avnav',
-		'show': "http://localhost:8080",
-		'edit': edit,
-		'included': 'no',
-		'plugin': '',
-		'install': install,
-		'uninstall': uninstall,
-		'settings': 'http://localhost:8888',
-		}
-		self.appsDict.append(app)
+		self.avnavFoundUpdate()
 
 		show = ''
 		edit = ''
@@ -76,6 +65,9 @@ class MyFrame(wx.Frame):
 		toolSettings = self.toolbar1.AddTool(106, _('Settings'), wx.Bitmap(self.currentdir+"/data/settings.png"))
 		self.Bind(wx.EVT_TOOL, self.OnToolSettings, toolSettings)
 		self.toolbar1.AddSeparator()
+		toolSources = self.toolbar1.AddTool(103, _('Add Sources'), wx.Bitmap(self.currentdir+"/data/sources.png"))
+		self.Bind(wx.EVT_TOOL, self.OnToolSources, toolSources)
+		if os.path.exists('/etc/apt/sources.list.d/open-mind.list'): self.toolbar1.EnableTool(103,False)
 		self.refreshButton = self.toolbar1.AddTool(104, _('Refresh'), wx.Bitmap(self.currentdir+"/data/refresh.png"))
 		self.Bind(wx.EVT_TOOL, self.OnRefreshButton, self.refreshButton)
 		self.avnavWeb = self.toolbar1.AddTool(105, _('Open Avnav'), wx.Bitmap(self.currentdir+"/data/sailboat24r.png"))
@@ -135,6 +127,47 @@ class MyFrame(wx.Frame):
 	def OnToolSettings(self, event=0): 
 		subprocess.call(['pkill', '-f', 'openplotter-settings'])
 		subprocess.Popen('openplotter-settings')
+		
+	def OnToolSources(self, e):
+		self.ShowStatusBarYELLOW(_('Adding packages sources, please wait... '))
+		self.logger.Clear()
+		self.notebook.ChangeSelection(1)
+		command = self.platform.admin+' settingsAVSourcesInstall'
+		popen = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, universal_newlines=True, shell=True)
+		for line in popen.stdout:
+			if not 'Warning' in line and not 'WARNING' in line:
+				self.logger.WriteText(line)
+				self.ShowStatusBarYELLOW(_('Adding packages sources, please wait... ')+line)
+				self.logger.ShowPosition(self.logger.GetLastPosition())
+		self.ShowStatusBarGREEN(_('Added sources.'))
+		if os.path.exists('/etc/apt/sources.list.d/open-mind.list'): self.toolbar1.EnableTool(103,False)		
+		self.avnavFoundUpdate()
+		self.OnRefreshButton()		
+
+	def avnavFoundUpdate(self): 
+		command = 'apt-cache search avnav'
+		output = subprocess.check_output(command.split(),universal_newlines=True)
+
+		edit = ''
+		install = ''
+		uninstall = ''
+		if self.platform.skPort:
+			install = self.platform.admin+' python3 '+self.currentdir+'/installAvnav.py'
+			uninstall = self.platform.admin+' python3 '+self.currentdir+'/uninstallAvnav.py'				
+
+		if 'avnav - avnav' in output:
+			self.appsDict = []
+			app = {
+			'name': 'Avnav',
+			'show': "http://localhost:8080",
+			'edit': edit,
+			'included': 'no',
+			'plugin': '',
+			'install': install,
+			'uninstall': uninstall,
+			'settings': 'http://localhost:8080',
+			}			
+			self.appsDict.append(app)
 
 	def OnAvnav(self,e):
 		if self.platform.skPort: 
@@ -172,6 +205,7 @@ class MyFrame(wx.Frame):
 		self.OnRefreshButton()
 
 	def OnRefreshButton(self, event=0):
+		self.avnavFoundUpdate()
 		self.notebook.ChangeSelection(0)
 		self.listApps.DeleteAllItems()
 		for i in self.appsDict:
@@ -184,7 +218,7 @@ class MyFrame(wx.Frame):
 		self.onListAppsDeselected()
 
 	def OnToolInstall(self, e):
-		if self.platform.skPort: 
+		if self.platform.skPort:
 			index = self.listApps.GetFirstSelected()
 			if index == -1: return
 			apps = list(reversed(self.appsDict))
@@ -207,6 +241,7 @@ class MyFrame(wx.Frame):
 				self.OnRefreshButton()
 				#self.restart_SK(0)
 			dlg.Destroy()
+			self.goodEnd(self.platform.isInstalled(name.lower()))
 		else: 
 			self.ShowStatusBarRED(_('Please install "Signal K Installer" OpenPlotter app'))
 			self.OnToolSettings()
@@ -232,12 +267,19 @@ class MyFrame(wx.Frame):
 					self.ShowStatusBarYELLOW(_('Uninstalling Avnav, please wait... ')+line)
 					self.logger.ShowPosition(self.logger.GetLastPosition())
 			self.OnRefreshButton()
-			#self.restart_SK(0)
 		dlg.Destroy()
+		self.goodEnd(not self.platform.isInstalled(name.lower()))
+
+	def goodEnd(self, status):
+		if status:
+			self.ShowStatusBarGREEN(_('DONE'))
+			wx.Sleep(1)
+			self.ShowStatusBarGREEN('')
 
 	def restart_SK(self, msg):
 		if msg == 0: msg = _('Restarting Signal K server... ')
 		seconds = 12
+		subprocess.call([self.platform.admin, 'python3', self.currentdir+'/service.py', 'restart'])
 		for i in range(seconds, 0, -1):
 			self.ShowStatusBarYELLOW(msg+str(i))
 			time.sleep(1)
@@ -270,11 +312,13 @@ class MyFrame(wx.Frame):
 		if not valid: return
 		self.onListAppsDeselected()
 		if self.listApps.GetItemBackgroundColour(i) != (200,200,200):
-			self.toolbar2.EnableTool(203,True)
-			self.toolbar2.EnableTool(205,True)
 			apps = list(reversed(self.appsDict))
+			if self.platform.isInstalled((apps[i]['name']).lower()):
+				self.toolbar2.EnableTool(205,True)
+			else:
+				self.toolbar2.EnableTool(203,True)
 			if apps[i]['settings']: self.toolbar2.EnableTool(204,True)
-			if apps[i]['edit']: self.toolbar2.EnableTool(201,True)
+			#if apps[i]['edit']: self.toolbar2.EnableTool(201,True)
 			if apps[i]['show']: self.toolbar2.EnableTool(202,True)
 		else: self.toolbar2.EnableTool(203,True)
 
@@ -282,13 +326,14 @@ class MyFrame(wx.Frame):
 		self.toolbar2.EnableTool(203,False)
 		self.toolbar2.EnableTool(205,False)
 		self.toolbar2.EnableTool(204,False)
-		self.toolbar2.EnableTool(201,False)
+		#self.toolbar2.EnableTool(201,False)
 		self.toolbar2.EnableTool(202,False)
 
 class ProcessSetting(wx.Dialog): 
 
 	def __init__(self, parent, title):
 		self.conf = conf.Conf()
+		self.parent = parent
 		self.platform = platform.Platform()
 		self.currentdir = os.path.dirname(os.path.abspath(__file__))
 		currentLanguage = self.conf.get('GENERAL', 'lang')
@@ -297,11 +342,20 @@ class ProcessSetting(wx.Dialog):
 		wx.Dialog.__init__(self, None, title=title, size=(400,320))
 		pnl = wx.Panel(self)
 		pnl.SetBackgroundColour(wx.Colour(230,230,230,255))
+		icon = wx.Icon(self.currentdir+"/data/sailboat24r.png", wx.BITMAP_TYPE_PNG)
+		self.SetIcon(icon)
 		
 		self.lblList = [_('Enable'),_('Disable')]
 
-		self.rbox = wx.RadioBox(pnl, label = 'Autostart', choices = self.lblList, majorDimension = 1, style = wx.RA_SPECIFY_ROWS)
-		self.rbox.Bind(wx.EVT_RADIOBOX,self.onRadioBox)
+		self.systemdbox = wx.RadioBox(pnl, label = 'Autostart', choices = self.lblList, majorDimension = 1, style = wx.RA_SPECIFY_ROWS)
+		self.systemdbox.Bind(wx.EVT_RADIOBOX,self.onSystemdBox)
+
+		self.skbox = wx.RadioBox(pnl, label = 'Avnav -> SignalK', choices = self.lblList, majorDimension = 1, style = wx.RA_SPECIFY_ROWS)
+		self.skbox.Bind(wx.EVT_RADIOBOX,self.onSkBox)
+
+		sbox0 = wx.BoxSizer(wx.VERTICAL)
+		sbox0.Add(self.systemdbox, 0, wx.ALL, 5)
+		sbox0.Add(self.skbox, 0, wx.ALL, 5)
 
 		sbox = wx.StaticBox(pnl, -1, _('Status'))
 
@@ -313,9 +367,14 @@ class ProcessSetting(wx.Dialog):
 		self.bStatusbox = wx.RadioBox(pnl, label = _('Substate'), choices = self.bStatusList, majorDimension = 1, style = wx.RA_SPECIFY_ROWS)
 		self.bStatusbox.Enable(False)
 
-		statusSizer = wx.StaticBoxSizer(sbox, wx.VERTICAL)
-		statusSizer.Add(self.aStatusbox, 0, wx.ALL, 5)
-		statusSizer.Add(self.bStatusbox, 0, wx.ALL, 5)
+		sbox1 = wx.StaticBoxSizer(sbox, wx.VERTICAL)
+		sbox1.Add(self.aStatusbox, 0, wx.ALL, 5)
+		sbox1.Add(self.bStatusbox, 0, wx.ALL, 5)
+
+		hbox = wx.BoxSizer(wx.HORIZONTAL)
+		hbox.Add(sbox0, 1, wx.ALL, 5)
+		hbox.AddStretchSpacer(1)
+		hbox.Add(sbox1, 1, wx.ALL, 5)
 
 		self.start = wx.Button(pnl, label=_('Start'))
 		self.start.Bind(wx.EVT_BUTTON, self.onStart)
@@ -324,11 +383,6 @@ class ProcessSetting(wx.Dialog):
 		self.restart = wx.Button(pnl, label=_('Restart'))
 		self.restart.Bind(wx.EVT_BUTTON, self.onRestart)
 		
-		hbox = wx.BoxSizer(wx.HORIZONTAL)
-		hbox.Add(self.rbox, 1, wx.ALL, 5)
-		hbox.AddStretchSpacer(1)
-		hbox.Add(statusSizer, 1, wx.ALL, 5)
-
 		vbox = wx.BoxSizer(wx.VERTICAL)
 		vbox.Add(hbox, 0, wx.ALL, 0)
 		vbox.AddStretchSpacer(1)
@@ -338,27 +392,41 @@ class ProcessSetting(wx.Dialog):
 		pnl.SetSizer(vbox)
 
 		self.statusUpdate()
-		
 		self.Centre() 
 		self.Show(True)
 
 	def statusUpdate(self): 
 		command = 'systemctl show avnav --no-page'
 		output = subprocess.check_output(command.split(),universal_newlines=True)
-		if 'UnitFileState=enabled' in output:	self.rbox.SetSelection(0)
-		else: 									self.rbox.SetSelection(1)
+		if 'UnitFileState=enabled' in output:	self.systemdbox.SetSelection(0)
+		else: 									self.systemdbox.SetSelection(1)
 		if 'ActiveState=active' in output:		self.aStatusbox.SetSelection(0)
 		else: 									self.aStatusbox.SetSelection(1)
 		if 'SubState=running' in output:		self.bStatusbox.SetSelection(0)
 		else: 									self.bStatusbox.SetSelection(1)
-
-	def onRadioBox(self,e): 
-		if self.lblList[0] == self.rbox.GetStringSelection():
+		skSettings = editSettings.EditSettings()
+		if skSettings.connectionIdExists('AvnavOut'):	 self.skbox.SetSelection(0)
+		else: 										 self.skbox.SetSelection(1)
+		
+	def onSystemdBox(self,e):
+		if self.lblList[0] == self.systemdbox.GetStringSelection():
 			subprocess.call(['systemctl', 'enable', 'avnav'])
 		else:
 			subprocess.call(['systemctl', 'stop', 'avnav'])
 			subprocess.call(['systemctl', 'disable', 'avnav'])
-
+			
+	def onSkBox(self,e):
+		skSettings = editSettings.EditSettings()
+		if self.lblList[0] == self.skbox.GetStringSelection():
+			if not skSettings.connectionIdExists('AvnavOut'):
+				# 		  def setNetworkConnection(self,ID,data,networkType,host,port):
+				if skSettings.setNetworkConnection('AvnavOut', 'NMEA0183', 'TCP', 'localhost', '28628'): self.parent.restart_SK(0)
+				else: self.parent.ShowStatusBarRED(_('Failed. Error creating connection in Signal K'))
+		else:
+			if skSettings.connectionIdExists('AvnavOut'):
+				if skSettings.removeConnection('AvnavOut'): self.parent.restart_SK(0)
+				else: self.parent.ShowStatusBarRED(_('Failed. Error removing connection in Signal K'))
+					
 	def onStart(self,e):
 		subprocess.call(['systemctl', 'start', 'avnav'])
 		self.statusUpdate()

@@ -15,27 +15,28 @@
 # You should have received a copy of the GNU General Public License
 # along with Openplotter. If not, see <http://www.gnu.org/licenses/>.
 
-import os, subprocess
+import os, subprocess, sys
 from openplotterSettings import conf
 from openplotterSettings import language
-from openplotterSettings import platform
-
 
 def main():
-	conf2 = conf.Conf()
-	currentdir = os.path.dirname(os.path.abspath(__file__))
-	currentLanguage = conf2.get('GENERAL', 'lang')
-	language.Language(currentdir,'openplotter-avnav',currentLanguage)
-
 	try:
-		platform2 = platform.Platform()
+		conf2 = conf.Conf()
+		currentdir = os.path.dirname(os.path.abspath(__file__))
+		currentLanguage = conf2.get('GENERAL', 'lang')
+		language.Language(currentdir,'openplotter-avnav',currentLanguage)
+		beta = conf2.get('GENERAL', 'beta')
 
-		subprocess.call(['systemctl', 'disable', 'avnav'])
-		subprocess.call(['systemctl', 'stop', 'avnav'])
+		print(_('Start adding sources.'))
 
-		subprocess.call(['apt', '-y', 'autoremove', 'avnav'])
+		os.system('cp '+currentdir+'/data/sources/open-mind.list /etc/apt/sources.list.d/open-mind.list')
+		print(_('Added list'))
+		os.system('apt-key add - < '+currentdir+'/data/sources/open-mind.space.gpg.key')
+		print(_('Added gpg.key'))
+		os.system('apt update')
+		print(_('app list updated'))
+		print(_('Done'))
 
-		print(_('DONE'))
 	except Exception as e: print(_('FAILED: ')+str(e))
 
 if __name__ == '__main__':

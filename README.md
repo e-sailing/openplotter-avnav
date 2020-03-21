@@ -2,25 +2,26 @@
 
 OpenPlotter app to manage Avnav. 
 
-### Installing
+#### Dependencies
 
-#### For development
-
-Install
+Download latest release of https://github.com/openplotter/openplotter-settings/releases and change to the directory where your download file is.
 
 ```
-sudo apt-get install -y --no-install-recommends apt-transport-https ca-certificates curl software-properties-common
-sudo wget -qO - https://open-mind.space/repo/open-mind.space.gpg.key | sudo apt-key add -
-echo 'deb https://open-mind.space/repo buster-stable avnav avnavtouch misc' | sudo tee -a /etc/apt/sources.list.d/open-mind.list
+sudo apt install ./openplotter-settings_2.xxxxx-stable_all.deb
 ```
 
-[openplotter-settings](https://github.com/openplotter/openplotter-settings) for **development**.
+From openplotter-settings you should install [openplotter-signalk-installer].
+
+### Install
 
 Clone the repository:
 
-`git clone https://github.com/e-sailing/openplotter-avnav.git`
+```
+cd ~
+git clone https://github.com/e-sailing/openplotter-avnav.git
+```
 
-Make your changes and create the package:
+(Make your changes and) create the package:
 
 ```
 cd openplotter-avnav
@@ -31,9 +32,11 @@ Install the package:
 
 ```
 cd ..
-sudo dpkg -i openplotter-avnav_x.x.x-xxx_all.deb
+sudo apt install ./openplotter-avnav_x.x.x-xxx_all.deb
 ```
 
-Run:
+### Run
 
 `openplotter-avnav`
+
+Or start Avnav from the menu (same place as openplotter-settings).
