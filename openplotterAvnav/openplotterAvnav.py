@@ -65,9 +65,9 @@ class MyFrame(wx.Frame):
 		toolSettings = self.toolbar1.AddTool(106, _('Settings'), wx.Bitmap(self.currentdir+"/data/settings.png"))
 		self.Bind(wx.EVT_TOOL, self.OnToolSettings, toolSettings)
 		self.toolbar1.AddSeparator()
-		toolSources = self.toolbar1.AddTool(103, _('Add Sources'), wx.Bitmap(self.currentdir+"/data/sources.png"))
-		self.Bind(wx.EVT_TOOL, self.OnToolSources, toolSources)
-		if os.path.exists('/etc/apt/sources.list.d/open-mind.list'): self.toolbar1.EnableTool(103,False)
+		#toolSources = self.toolbar1.AddTool(103, _('Add Sources'), wx.Bitmap(self.currentdir+"/data/sources.png"))
+		#self.Bind(wx.EVT_TOOL, self.OnToolSources, toolSources)
+		#if os.path.exists('/etc/apt/sources.list.d/open-mind.list'): self.toolbar1.EnableTool(103,False)
 		self.refreshButton = self.toolbar1.AddTool(104, _('Refresh'), wx.Bitmap(self.currentdir+"/data/refresh.png"))
 		self.Bind(wx.EVT_TOOL, self.OnRefreshButton, self.refreshButton)
 		self.avnavWeb = self.toolbar1.AddTool(105, _('Open Avnav'), wx.Bitmap(self.currentdir+"/data/sailboat24r.png"))
@@ -128,21 +128,21 @@ class MyFrame(wx.Frame):
 		subprocess.call(['pkill', '-f', 'openplotter-settings'])
 		subprocess.Popen('openplotter-settings')
 		
-	def OnToolSources(self, e):
-		self.ShowStatusBarYELLOW(_('Adding packages sources, please wait... '))
-		self.logger.Clear()
-		self.notebook.ChangeSelection(1)
-		command = self.platform.admin+' settingsAVSourcesInstall'
-		popen = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, universal_newlines=True, shell=True)
-		for line in popen.stdout:
-			if not 'Warning' in line and not 'WARNING' in line:
-				self.logger.WriteText(line)
-				self.ShowStatusBarYELLOW(_('Adding packages sources, please wait... ')+line)
-				self.logger.ShowPosition(self.logger.GetLastPosition())
-		self.ShowStatusBarGREEN(_('Added sources.'))
-		if os.path.exists('/etc/apt/sources.list.d/open-mind.list'): self.toolbar1.EnableTool(103,False)		
-		self.avnavFoundUpdate()
-		self.OnRefreshButton()		
+	#def OnToolSources(self, e):
+	#	self.ShowStatusBarYELLOW(_('Adding packages sources, please wait... '))
+	#	self.logger.Clear()
+	#	self.notebook.ChangeSelection(1)
+	#	command = self.platform.admin+' settingsAVSourcesInstall'
+	#	popen = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, universal_newlines=True, shell=True)
+	#	for line in popen.stdout:
+	#		if not 'Warning' in line and not 'WARNING' in line:
+	#			self.logger.WriteText(line)
+	#			self.ShowStatusBarYELLOW(_('Adding packages sources, please wait... ')+line)
+	#			self.logger.ShowPosition(self.logger.GetLastPosition())
+	#	self.ShowStatusBarGREEN(_('Added sources.'))
+	#	if os.path.exists('/etc/apt/sources.list.d/open-mind.list'): self.toolbar1.EnableTool(103,False)		
+	#	self.avnavFoundUpdate()
+	#	self.OnRefreshButton()		
 
 	def avnavFoundUpdate(self): 
 		command = 'apt-cache search avnav'

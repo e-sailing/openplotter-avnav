@@ -59,6 +59,7 @@ def main():
 		subprocess.call(['systemctl', 'daemon-reload'])
 		subprocess.call(['systemctl', 'enable', 'avnav'])
 		subprocess.call(['systemctl', 'restart', 'avnav'])
+		subprocess.call(['cp', '-avr', '/usr/lib/python3/dist-packages/openplotterAvnav/data/OpenSeaMapsOnline', conf2.home + '/avnav/data/charts'])
 
 		print(_('DONE'))
 	except Exception as e: print(_('FAILED: ')+str(e))

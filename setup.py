@@ -31,6 +31,7 @@ setup (
 	'Operating System :: POSIX :: Linux',
 	'Programming Language :: Python :: 3'],
 	include_package_data=True,
-	entry_points={'console_scripts': ['openplotter-avnav=openplotterAvnav.openplotterAvnav:main','settingsAVSourcesInstall=openplotterAvnav.installSources:main']},
+	#entry_points={'console_scripts': ['openplotter-avnav=openplotterAvnav.openplotterAvnav:main','settingsAVSourcesInstall=openplotterAvnav.installSources:main']},
+	entry_points={'console_scripts': ['openplotter-avnav=openplotterAvnav.openplotterAvnav:main']},
 	data_files=[('share/applications', ['openplotterAvnav/data/openplotter-avnav.desktop']),('share/pixmaps', ['openplotterAvnav/data/sailboat24r.png']),],
 	)

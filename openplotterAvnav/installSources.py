@@ -35,7 +35,7 @@ def main():
 		print(_('Added gpg.key'))
 		os.system('apt update')
 		print(_('app list updated'))
-		print(_('Done'))
+		print(_('DONE'))
 
 	except Exception as e: print(_('FAILED: ')+str(e))
 
