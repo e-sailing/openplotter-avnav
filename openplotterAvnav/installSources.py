@@ -27,15 +27,15 @@ def main():
 		language.Language(currentdir,'openplotter-avnav',currentLanguage)
 		beta = conf2.get('GENERAL', 'beta')
 
-		print(_('Start adding sources.'))
+		#print(_('Start adding sources.'))
 
-		os.system('cp '+currentdir+'/data/sources/open-mind.list /etc/apt/sources.list.d/open-mind.list')
-		print(_('Added list'))
-		os.system('apt-key add - < '+currentdir+'/data/sources/open-mind.space.gpg.key')
-		print(_('Added gpg.key'))
-		os.system('apt update')
-		print(_('app list updated'))
-		print(_('DONE'))
+		#os.system('cp '+currentdir+'/data/sources/open-mind.list /etc/apt/sources.list.d/open-mind.list')
+		#print(_('Added list'))
+		#os.system('apt-key add - < '+currentdir+'/data/sources/open-mind.space.gpg.key')
+		#print(_('Added gpg.key'))
+		#os.system('apt update')
+		#print(_('app list updated'))
+		#print(_('DONE'))
 
 	except Exception as e: print(_('FAILED: ')+str(e))
 
