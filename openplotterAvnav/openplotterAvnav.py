@@ -43,9 +43,6 @@ class MyFrame(wx.Frame):
 			uninstall = self.platform.admin+' python3 '+self.currentdir+'/uninstallAvnav.py'			
 		self.avnavFoundUpdate()
 
-		show = ''
-		edit = ''
-
 		if os.path.dirname(os.path.abspath(__file__))[0:4] == '/usr': 
 			v = version
 		else: v = version.version
@@ -65,13 +62,8 @@ class MyFrame(wx.Frame):
 		toolSettings = self.toolbar1.AddTool(106, _('Settings'), wx.Bitmap(self.currentdir+"/data/settings.png"))
 		self.Bind(wx.EVT_TOOL, self.OnToolSettings, toolSettings)
 		self.toolbar1.AddSeparator()
-		#toolSources = self.toolbar1.AddTool(103, _('Add Sources'), wx.Bitmap(self.currentdir+"/data/sources.png"))
-		#self.Bind(wx.EVT_TOOL, self.OnToolSources, toolSources)
-		#if os.path.exists('/etc/apt/sources.list.d/open-mind.list'): self.toolbar1.EnableTool(103,False)
 		self.refreshButton = self.toolbar1.AddTool(104, _('Refresh'), wx.Bitmap(self.currentdir+"/data/refresh.png"))
 		self.Bind(wx.EVT_TOOL, self.OnRefreshButton, self.refreshButton)
-		self.avnavWeb = self.toolbar1.AddTool(105, _('Open Avnav'), wx.Bitmap(self.currentdir+"/data/sailboat24r.png"))
-		self.Bind(wx.EVT_TOOL, self.OnAvnav, self.avnavWeb)
 
 		self.notebook = wx.Notebook(self)
 		self.notebook.Bind(wx.EVT_NOTEBOOK_PAGE_CHANGED, self.onTabChange)
@@ -128,22 +120,6 @@ class MyFrame(wx.Frame):
 		subprocess.call(['pkill', '-f', 'openplotter-settings'])
 		subprocess.Popen('openplotter-settings')
 		
-	#def OnToolSources(self, e):
-	#	self.ShowStatusBarYELLOW(_('Adding packages sources, please wait... '))
-	#	self.logger.Clear()
-	#	self.notebook.ChangeSelection(1)
-	#	command = self.platform.admin+' settingsAVSourcesInstall'
-	#	popen = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, universal_newlines=True, shell=True)
-	#	for line in popen.stdout:
-	#		if not 'Warning' in line and not 'WARNING' in line:
-	#			self.logger.WriteText(line)
-	#			self.ShowStatusBarYELLOW(_('Adding packages sources, please wait... ')+line)
-	#			self.logger.ShowPosition(self.logger.GetLastPosition())
-	#	self.ShowStatusBarGREEN(_('Added sources.'))
-	#	if os.path.exists('/etc/apt/sources.list.d/open-mind.list'): self.toolbar1.EnableTool(103,False)		
-	#	self.avnavFoundUpdate()
-	#	self.OnRefreshButton()		
-
 	def avnavFoundUpdate(self): 
 		command = 'apt-cache search avnav'
 		output = subprocess.check_output(command.split(),universal_newlines=True)
@@ -168,14 +144,6 @@ class MyFrame(wx.Frame):
 			'settings': 'http://localhost:8080',
 			}			
 			self.appsDict.append(app)
-
-	def OnAvnav(self,e):
-		if self.platform.skPort: 
-			url = self.platform.http+'localhost:8080'
-			webbrowser.open(url, new=2)
-		else: 
-			self.ShowStatusBarRED(_('Please install "Signal K Installer" OpenPlotter app'))
-			self.OnToolSettings()
 
 	def pageApps(self):
 		self.listApps = wx.ListCtrl(self.apps, -1, style=wx.LC_REPORT | wx.LC_SINGLE_SEL | wx.LC_HRULES, size=(-1,200))
@@ -318,7 +286,6 @@ class MyFrame(wx.Frame):
 			else:
 				self.toolbar2.EnableTool(203,True)
 			if apps[i]['settings']: self.toolbar2.EnableTool(204,True)
-			#if apps[i]['edit']: self.toolbar2.EnableTool(201,True)
 			if apps[i]['show']: self.toolbar2.EnableTool(202,True)
 		else: self.toolbar2.EnableTool(203,True)
 
@@ -326,7 +293,6 @@ class MyFrame(wx.Frame):
 		self.toolbar2.EnableTool(203,False)
 		self.toolbar2.EnableTool(205,False)
 		self.toolbar2.EnableTool(204,False)
-		#self.toolbar2.EnableTool(201,False)
 		self.toolbar2.EnableTool(202,False)
 
 class ProcessSetting(wx.Dialog): 

@@ -19,7 +19,7 @@ import os, subprocess
 from openplotterSettings import conf
 from openplotterSettings import language
 from openplotterSettings import platform
-
+from openplotterSignalkInstaller import editSettings
 
 def main():
 	conf2 = conf.Conf()
@@ -32,6 +32,12 @@ def main():
 
 		subprocess.call(['systemctl', 'disable', 'avnav'])
 		subprocess.call(['systemctl', 'stop', 'avnav'])
+		if os.path.isfile('/usr/lib/systemd/system/avnav.service.d/avnav.conf'):
+			os.remove('/usr/lib/systemd/system/avnav.service.d/avnav.conf')
+			
+		skSettings = editSettings.EditSettings()
+		if skSettings.connectionIdExists('AvnavOut'):
+			skSettings.removeConnection('AvnavOut')			
 
 		subprocess.call(['apt', '-y', 'autoremove', 'avnav'])
 

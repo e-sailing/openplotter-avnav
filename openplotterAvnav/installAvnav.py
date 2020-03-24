@@ -32,10 +32,7 @@ def main():
 		platform2 = platform.Platform()
 
 		subprocess.call(['apt', '-y', 'install', 'avnav'])
-		#if not os.path.isfile(conf2.home+'/avnav_20200314_all.deb'):
-		#	subprocess.call(['wget', '-P',conf2.home ,'https://www.wellenvogel.net/software/avnav/downloads/daily/20200314/avnav_20200314_all.deb'])
-		#subprocess.call(['apt', '-y', 'install', conf2.home+'/avnav_20200314_all.deb'])
-
+		
 		print(_('DONE'))
 	except Exception as e: print(_('FAILED: ')+str(e))
 		
@@ -50,7 +47,6 @@ def main():
 		data+= 'ExecStart=\n'
 		data+= 'ExecStart=/usr/bin/avnav -q -b ' + conf2.home + '/avnav/data -t /usr/lib/python3/dist-packages/openplotterAvnav/data/avnav_server.xml\n'
 		data+= '[Unit]\n'
-		#data+= 'After=avnav-check-parts.service\n'
 		data+= 'WantedBy=multi-user.target\n'
 
 		fo = open('/usr/lib/systemd/system/avnav.service.d/avnav.conf', "w")
@@ -67,8 +63,6 @@ def main():
 	print(_('Setting version...'))
 	if platform.Platform().isInstalled('avnav'):
 		try:
-			#if os.path.dirname(os.path.abspath(__file__))[0:4] == '/usr': v = version
-			#else: v = version		
 			conf2.set('APPS', 'avnav', version.version)
 			print(_('DONE'))
 		except Exception as e: print(_('FAILED: ')+str(e))
