@@ -22,11 +22,18 @@ from openplotterSettings import conf
 from openplotterSettings import language
 from openplotterSettings import platform
 from openplotterSignalkInstaller import editSettings
+from wx.lib.mixins.listctrl import CheckListCtrlMixin, ListCtrlAutoWidthMixin
 
 if os.path.dirname(os.path.abspath(__file__))[0:4] == '/usr':
 	from .version import version
 else:
 	import version
+
+class CheckListCtrl(wx.ListCtrl, CheckListCtrlMixin, ListCtrlAutoWidthMixin):
+	def __init__(self, parent, height):
+		wx.ListCtrl.__init__(self, parent, -1, style=wx.LC_REPORT | wx.SUNKEN_BORDER, size=(650, height))
+		CheckListCtrlMixin.__init__(self)
+		ListCtrlAutoWidthMixin.__init__(self)
 
 class MyFrame(wx.Frame):
 	def __init__(self):
@@ -68,15 +75,18 @@ class MyFrame(wx.Frame):
 		self.notebook = wx.Notebook(self)
 		self.notebook.Bind(wx.EVT_NOTEBOOK_PAGE_CHANGED, self.onTabChange)
 		self.apps = wx.Panel(self.notebook)
+		self.systemd = wx.Panel(self.notebook)		
 		self.output = wx.Panel(self.notebook)
 		self.notebook.AddPage(self.apps, _('Apps'))
+		self.notebook.AddPage(self.systemd, _('Process status'))
 		self.notebook.AddPage(self.output, '')
 		self.il = wx.ImageList(24, 24)
 		img0 = self.il.Add(wx.Bitmap(self.currentdir+"/data/sailboat24r.png", wx.BITMAP_TYPE_PNG))
 		img1 = self.il.Add(wx.Bitmap(self.currentdir+"/data/output.png", wx.BITMAP_TYPE_PNG))
 		self.notebook.AssignImageList(self.il)
 		self.notebook.SetPageImage(0, img0)
-		self.notebook.SetPageImage(1, img1)
+		self.notebook.SetPageImage(1, img0)
+		self.notebook.SetPageImage(2, img1)
 
 		vbox = wx.BoxSizer(wx.VERTICAL)
 		vbox.Add(self.toolbar1, 0, wx.EXPAND)
@@ -84,6 +94,7 @@ class MyFrame(wx.Frame):
 		self.SetSizer(vbox)
 
 		self.pageApps()
+		self.pageSystemd()
 		self.pageOutput()
 
 		maxi = self.conf.get('GENERAL', 'maximize')
@@ -266,14 +277,6 @@ class MyFrame(wx.Frame):
 		apps = list(reversed(self.appsDict))
 		webbrowser.open(apps[index]['show'], new=2)
 
-	def pageOutput(self):
-		self.logger = rt.RichTextCtrl(self.output, style=wx.TE_MULTILINE|wx.TE_READONLY|wx.TE_DONTWRAP|wx.LC_SORT_ASCENDING)
-		self.logger.SetMargins((10,10))
-
-		sizer = wx.BoxSizer(wx.VERTICAL)
-		sizer.Add(self.logger, 1, wx.EXPAND, 0)
-		self.output.SetSizer(sizer)
-
 	def onListAppsSelected(self, e):
 		i = e.GetIndex()
 		valid = e and i >= 0
@@ -295,115 +298,90 @@ class MyFrame(wx.Frame):
 		self.toolbar2.EnableTool(204,False)
 		self.toolbar2.EnableTool(202,False)
 
-class ProcessSetting(wx.Dialog): 
+################################################################################
 
-	def __init__(self, parent, title):
-		self.conf = conf.Conf()
-		self.parent = parent
-		self.platform = platform.Platform()
-		self.currentdir = os.path.dirname(os.path.abspath(__file__))
-		currentLanguage = self.conf.get('GENERAL', 'lang')
-		self.language = language.Language(self.currentdir,'openplotter-avnav',currentLanguage)
+	def pageSystemd(self):
+		self.started = False
+		self.process = ['avnav']
+		self.aStatusList = [_('inactive'),_('active')]
+		self.bStatusList = [_('dead'),_('running')] 
 
-		wx.Dialog.__init__(self, None, title=title, size=(400,320))
-		pnl = wx.Panel(self)
-		pnl.SetBackgroundColour(wx.Colour(230,230,230,255))
-		icon = wx.Icon(self.currentdir+"/data/sailboat24r.png", wx.BITMAP_TYPE_PNG)
-		self.SetIcon(icon)
+		self.listSystemd = CheckListCtrl(self.systemd, 152)
+		self.listSystemd.InsertColumn(0, _('Autostart'), width=90)
+		self.listSystemd.InsertColumn(1, _('Process'), width=150)
+		self.listSystemd.InsertColumn(2, _('Status'), width=150)
+		self.listSystemd.InsertColumn(3, '  ', width=150)
 		
-		self.lblList = [_('Enable'),_('Disable')]
+		self.listSystemd.OnCheckItem = self.OnCheckItem
 
-		self.systemdbox = wx.RadioBox(pnl, label = 'Autostart', choices = self.lblList, majorDimension = 1, style = wx.RA_SPECIFY_ROWS)
-		self.systemdbox.Bind(wx.EVT_RADIOBOX,self.onSystemdBox)
+		self.toolbar3 = wx.ToolBar(self.systemd, style=wx.TB_TEXT | wx.TB_VERTICAL)
+		self.start = self.toolbar3.AddTool(301, _('Start'), wx.Bitmap(self.currentdir+"/data/start.png"))
+		self.Bind(wx.EVT_TOOL, self.onStart, self.start)
+		self.stop = self.toolbar3.AddTool(302, _('Stop'), wx.Bitmap(self.currentdir+"/data/stop.png"))
+		self.Bind(wx.EVT_TOOL, self.onStop, self.stop)
+		self.restart = self.toolbar3.AddTool(303, _('Restart'), wx.Bitmap(self.currentdir+"/data/restart.png"))
+		self.Bind(wx.EVT_TOOL, self.onRestart, self.restart)	
 
-		self.skbox = wx.RadioBox(pnl, label = 'Avnav -> SignalK', choices = self.lblList, majorDimension = 1, style = wx.RA_SPECIFY_ROWS)
-		self.skbox.Bind(wx.EVT_RADIOBOX,self.onSkBox)
+		sizer = wx.BoxSizer(wx.HORIZONTAL)
+		sizer.Add(self.listSystemd, 1, wx.EXPAND, 0)
+		sizer.Add(self.toolbar3, 0)
 
-		sbox0 = wx.BoxSizer(wx.VERTICAL)
-		sbox0.Add(self.systemdbox, 0, wx.ALL, 5)
-		sbox0.Add(self.skbox, 0, wx.ALL, 5)
+		self.systemd.SetSizer(sizer)
 
-		sbox = wx.StaticBox(pnl, -1, _('Status'))
+		self.set_listSystemd()
+		self.started = True
 
-		self.aStatusList = [_('active'),_('inactive')]
-		self.aStatusbox = wx.RadioBox(pnl, label = _('ActiveState'), choices = self.aStatusList, majorDimension = 1, style = wx.RA_SPECIFY_ROWS)
-		self.aStatusbox.Enable(False)
+	def set_listSystemd(self):
+		self.listSystemd.DeleteAllItems()
+		index = 1
+		for i in self.process:
+			if i:
+				index = self.listSystemd.InsertItem(sys.maxsize, '')
+				self.statusUpdate(i,index)
 
-		self.bStatusList = [_('running'),_('dead')] 
-		self.bStatusbox = wx.RadioBox(pnl, label = _('Substate'), choices = self.bStatusList, majorDimension = 1, style = wx.RA_SPECIFY_ROWS)
-		self.bStatusbox.Enable(False)
-
-		sbox1 = wx.StaticBoxSizer(sbox, wx.VERTICAL)
-		sbox1.Add(self.aStatusbox, 0, wx.ALL, 5)
-		sbox1.Add(self.bStatusbox, 0, wx.ALL, 5)
-
-		hbox = wx.BoxSizer(wx.HORIZONTAL)
-		hbox.Add(sbox0, 1, wx.ALL, 5)
-		hbox.AddStretchSpacer(1)
-		hbox.Add(sbox1, 1, wx.ALL, 5)
-
-		self.start = wx.Button(pnl, label=_('Start'))
-		self.start.Bind(wx.EVT_BUTTON, self.onStart)
-		self.stop = wx.Button(pnl, label=_('Stop'))
-		self.stop.Bind(wx.EVT_BUTTON, self.onStop)
-		self.restart = wx.Button(pnl, label=_('Restart'))
-		self.restart.Bind(wx.EVT_BUTTON, self.onRestart)
-		
-		vbox = wx.BoxSizer(wx.VERTICAL)
-		vbox.Add(hbox, 0, wx.ALL, 0)
-		vbox.AddStretchSpacer(1)
-		vbox.Add(self.start, 0, wx.LEFT | wx.BOTTOM, 5)
-		vbox.Add(self.stop, 0, wx.ALL, 5)
-		vbox.Add(self.restart, 0, wx.ALL, 5)
-		pnl.SetSizer(vbox)
-
-		self.statusUpdate()
-		self.Centre() 
-		self.Show(True)
-
-	def statusUpdate(self): 
-		command = 'systemctl show avnav --no-page'
+	def statusUpdate(self, process, index): 
+		command = 'systemctl show ' + process + ' --no-page'
 		output = subprocess.check_output(command.split(),universal_newlines=True)
-		if 'UnitFileState=enabled' in output:	self.systemdbox.SetSelection(0)
-		else: 									self.systemdbox.SetSelection(1)
-		if 'ActiveState=active' in output:		self.aStatusbox.SetSelection(0)
-		else: 									self.aStatusbox.SetSelection(1)
-		if 'SubState=running' in output:		self.bStatusbox.SetSelection(0)
-		else: 									self.bStatusbox.SetSelection(1)
-		skSettings = editSettings.EditSettings()
-		if skSettings.connectionIdExists('AvnavOut'):	 self.skbox.SetSelection(0)
-		else: 										 self.skbox.SetSelection(1)
-		
-	def onSystemdBox(self,e):
-		if self.lblList[0] == self.systemdbox.GetStringSelection():
-			subprocess.call(['systemctl', 'enable', 'avnav'])
-		else:
-			subprocess.call(['systemctl', 'stop', 'avnav'])
-			subprocess.call(['systemctl', 'disable', 'avnav'])
-			
-	def onSkBox(self,e):
-		skSettings = editSettings.EditSettings()
-		if self.lblList[0] == self.skbox.GetStringSelection():
-			if not skSettings.connectionIdExists('AvnavOut'):
-				# 		  def setNetworkConnection(self,ID,data,networkType,host,port):
-				if skSettings.setNetworkConnection('AvnavOut', 'NMEA0183', 'TCP', 'localhost', '28628'): self.parent.restart_SK(0)
-				else: self.parent.ShowStatusBarRED(_('Failed. Error creating connection in Signal K'))
-		else:
-			if skSettings.connectionIdExists('AvnavOut'):
-				if skSettings.removeConnection('AvnavOut'): self.parent.restart_SK(0)
-				else: self.parent.ShowStatusBarRED(_('Failed. Error removing connection in Signal K'))
-					
+		if 'UnitFileState=enabled' in output: self.listSystemd.CheckItem(index)
+		self.listSystemd.SetItem(index, 1, process)
+		self.listSystemd.SetItem(index, 2, self.aStatusList[('ActiveState=active' in output)*1])
+		self.listSystemd.SetItem(index, 3, self.bStatusList[('SubState=running' in output)*1])
+						
 	def onStart(self,e):
-		subprocess.call(['systemctl', 'start', 'avnav'])
-		self.statusUpdate()
+		index = self.listSystemd.GetFirstSelected()
+		if index == -1: return
+		subprocess.call((self.platform.admin + ' systemctl start ' + self.process[index]).split())
+		self.set_listSystemd()
 
 	def onStop(self,e):
-		subprocess.call(['systemctl', 'stop', 'avnav'])
-		self.statusUpdate()
+		index = self.listSystemd.GetFirstSelected()
+		if index == -1: return
+		subprocess.call((self.platform.admin + ' systemctl stop ' + self.process[index]).split())
+		self.set_listSystemd()
 
 	def onRestart(self,e):
-		subprocess.call(['systemctl', 'restart', 'avnav'])
-		self.statusUpdate()
+		index = self.listSystemd.GetFirstSelected()
+		if index == -1: return
+		subprocess.call((self.platform.admin + ' systemctl restart ' + self.process[index]).split())
+		self.set_listSystemd()
+		
+	def OnCheckItem(self, index, flag):
+		if not self.started: return
+		if flag:
+			subprocess.call((self.platform.admin + ' systemctl enable ' + self.process[index]).split())
+		else:
+			subprocess.call((self.platform.admin + ' systemctl disable ' + self.process[index]).split())
+		#self.set_listSystemd()
+
+################################################################################
+
+	def pageOutput(self):
+		self.logger = rt.RichTextCtrl(self.output, style=wx.TE_MULTILINE|wx.TE_READONLY|wx.TE_DONTWRAP|wx.LC_SORT_ASCENDING)
+		self.logger.SetMargins((10,10))
+
+		sizer = wx.BoxSizer(wx.VERTICAL)
+		sizer.Add(self.logger, 1, wx.EXPAND, 0)
+		self.output.SetSizer(sizer)
 
 def main():
 	app = wx.App()
