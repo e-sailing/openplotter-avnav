@@ -78,15 +78,16 @@ class MyFrame(wx.Frame):
 		self.systemd = wx.Panel(self.notebook)		
 		self.output = wx.Panel(self.notebook)
 		self.notebook.AddPage(self.apps, _('Apps'))
-		self.notebook.AddPage(self.systemd, _('Process status'))
+		self.notebook.AddPage(self.systemd, _('Processes'))
 		self.notebook.AddPage(self.output, '')
 		self.il = wx.ImageList(24, 24)
 		img0 = self.il.Add(wx.Bitmap(self.currentdir+"/data/sailboat24r.png", wx.BITMAP_TYPE_PNG))
-		img1 = self.il.Add(wx.Bitmap(self.currentdir+"/data/output.png", wx.BITMAP_TYPE_PNG))
+		img1 = self.il.Add(wx.Bitmap(self.currentdir+"/data/process.png", wx.BITMAP_TYPE_PNG))
+		img2 = self.il.Add(wx.Bitmap(self.currentdir+"/data/output.png", wx.BITMAP_TYPE_PNG))
 		self.notebook.AssignImageList(self.il)
 		self.notebook.SetPageImage(0, img0)
-		self.notebook.SetPageImage(1, img0)
-		self.notebook.SetPageImage(2, img1)
+		self.notebook.SetPageImage(1, img1)
+		self.notebook.SetPageImage(2, img2)
 
 		vbox = wx.BoxSizer(wx.VERTICAL)
 		vbox.Add(self.toolbar1, 0, wx.EXPAND)
@@ -162,6 +163,7 @@ class MyFrame(wx.Frame):
 		self.listApps.InsertColumn(1, _('status'), width=365)
 		self.listApps.Bind(wx.EVT_LIST_ITEM_SELECTED, self.onListAppsSelected)
 		self.listApps.Bind(wx.EVT_LIST_ITEM_DESELECTED, self.onListAppsDeselected)
+		self.listApps.SetTextColour(wx.BLACK)
 
 		self.toolbar2 = wx.ToolBar(self.apps, style=wx.TB_TEXT | wx.TB_VERTICAL)
 		self.settingsButton = self.toolbar2.AddTool(204, _('Settings'), wx.Bitmap(self.currentdir+"/data/settings2.png"))
@@ -183,6 +185,27 @@ class MyFrame(wx.Frame):
 
 		self.OnRefreshButton()
 
+	def onListAppsSelected(self, e):
+		i = e.GetIndex()
+		valid = e and i >= 0
+		if not valid: return
+		self.onListAppsDeselected()
+		if self.listApps.GetItemBackgroundColour(i) != (200,200,200):
+			self.toolbar2.EnableTool(203,True)
+			self.toolbar2.EnableTool(205,True)
+			apps = list(reversed(self.appsDict))
+			if apps[i]['settings']: self.toolbar2.EnableTool(204,True)
+			if apps[i]['edit']: self.toolbar2.EnableTool(201,True)
+			if apps[i]['show']: self.toolbar2.EnableTool(202,True)
+		else: self.toolbar2.EnableTool(203,True)
+
+	def onListAppsDeselected(self, event=0):
+		self.toolbar2.EnableTool(203,False)
+		self.toolbar2.EnableTool(205,False)
+		self.toolbar2.EnableTool(204,False)
+		self.toolbar2.EnableTool(201,False)
+		self.toolbar2.EnableTool(202,False)
+
 	def OnRefreshButton(self, event=0):
 		self.avnavFoundUpdate()
 		self.notebook.ChangeSelection(0)
@@ -195,6 +218,8 @@ class MyFrame(wx.Frame):
 				self.listApps.SetItem(item, 1, _('not installed'))
 				self.listApps.SetItemBackgroundColour(item,(200,200,200))
 		self.onListAppsDeselected()
+		try: self.set_listSystemd()
+		except: pass	
 
 	def OnToolInstall(self, e):
 		if self.platform.skPort:
@@ -210,7 +235,7 @@ class MyFrame(wx.Frame):
 			dlg = wx.MessageDialog(None, msg, _('Question'), wx.YES_NO | wx.NO_DEFAULT | wx.ICON_EXCLAMATION)
 			if dlg.ShowModal() == wx.ID_YES:
 				self.logger.Clear()
-				self.notebook.ChangeSelection(1)
+				self.notebook.ChangeSelection(2)
 				popen = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, universal_newlines=True, shell=True)
 				for line in popen.stdout:
 					if not 'Warning' in line and not 'WARNING' in line:
@@ -238,7 +263,7 @@ class MyFrame(wx.Frame):
 		dlg = wx.MessageDialog(None, msg, _('Question'), wx.YES_NO | wx.NO_DEFAULT | wx.ICON_EXCLAMATION)
 		if dlg.ShowModal() == wx.ID_YES:
 			self.logger.Clear()
-			self.notebook.ChangeSelection(1)
+			self.notebook.ChangeSelection(2)
 			popen = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, universal_newlines=True, shell=True)
 			for line in popen.stdout:
 				if not 'Warning' in line and not 'WARNING' in line:
@@ -311,6 +336,9 @@ class MyFrame(wx.Frame):
 		self.listSystemd.InsertColumn(1, _('Process'), width=150)
 		self.listSystemd.InsertColumn(2, _('Status'), width=150)
 		self.listSystemd.InsertColumn(3, '  ', width=150)
+		self.listSystemd.Bind(wx.EVT_LIST_ITEM_SELECTED, self.onListSystemdSelected)
+		self.listSystemd.Bind(wx.EVT_LIST_ITEM_DESELECTED, self.onListSystemdDeselected)
+		self.listSystemd.SetTextColour(wx.BLACK)
 		
 		self.listSystemd.OnCheckItem = self.OnCheckItem
 
@@ -331,13 +359,32 @@ class MyFrame(wx.Frame):
 		self.set_listSystemd()
 		self.started = True
 
+	def onListSystemdSelected(self, e):
+		i = e.GetIndex()
+		valid = e and i >= 0
+		if not valid: return
+		self.toolbar3.EnableTool(301,True)
+		self.toolbar3.EnableTool(302,True)
+		self.toolbar3.EnableTool(303,True)
+
+	def onListSystemdDeselected(self, event=0):
+		self.toolbar3.EnableTool(301,False)
+		self.toolbar3.EnableTool(302,False)
+		self.toolbar3.EnableTool(303,False)
+
 	def set_listSystemd(self):
+		self.process = ['avnav']
+		#self.process = []
+		#if self.platform.isSKpluginInstalled('xxxx'):
+		#	self.process = ['xxxx']
 		self.listSystemd.DeleteAllItems()
 		index = 1
 		for i in self.process:
 			if i:
 				index = self.listSystemd.InsertItem(sys.maxsize, '')
 				self.statusUpdate(i,index)
+		self.onListSystemdDeselected()
+				
 
 	def statusUpdate(self, process, index): 
 		command = 'systemctl show ' + process + ' --no-page'
@@ -350,19 +397,25 @@ class MyFrame(wx.Frame):
 	def onStart(self,e):
 		index = self.listSystemd.GetFirstSelected()
 		if index == -1: return
+		self.ShowStatusBarYELLOW(_('Starting process...'))
 		subprocess.call((self.platform.admin + ' systemctl start ' + self.process[index]).split())
+		self.ShowStatusBarGREEN(_('Done'))
 		self.set_listSystemd()
 
 	def onStop(self,e):
 		index = self.listSystemd.GetFirstSelected()
 		if index == -1: return
+		self.ShowStatusBarYELLOW(_('Stopping process...'))
 		subprocess.call((self.platform.admin + ' systemctl stop ' + self.process[index]).split())
+		self.ShowStatusBarGREEN(_('Done'))
 		self.set_listSystemd()
 
 	def onRestart(self,e):
 		index = self.listSystemd.GetFirstSelected()
 		if index == -1: return
+		self.ShowStatusBarYELLOW(_('Restarting process...'))
 		subprocess.call((self.platform.admin + ' systemctl restart ' + self.process[index]).split())
+		self.ShowStatusBarGREEN(_('Done'))
 		self.set_listSystemd()
 		
 	def OnCheckItem(self, index, flag):
