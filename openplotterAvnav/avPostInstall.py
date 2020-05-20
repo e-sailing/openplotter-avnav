@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 
 # This file is part of Openplotter.
-# Copyright (C) 2020 by Sailoog <https://github.com/openplotter>
-#                     e-sailing <https://github.com/e-sailing/openplotter-avnav>
+# Copyright (C) 2020 by Sailoog <https://github.com/openplotter/openplotter-sdr-vhf>
+# Copyright (C) 2020 by e-sailing <https://github.com/e-sailing/openplotter-sdr-vhf>
+#
 # Openplotter is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 2 of the License, or
@@ -19,7 +20,7 @@ import os, subprocess
 from openplotterSettings import conf
 from openplotterSettings import language
 from openplotterSettings import platform
-import version
+from .version import version
 
 def main():
 	conf2 = conf.Conf()
@@ -55,7 +56,7 @@ def main():
 		subprocess.call(['systemctl', 'daemon-reload'])
 		subprocess.call(['systemctl', 'enable', 'avnav'])
 		subprocess.call(['systemctl', 'restart', 'avnav'])
-		subprocess.call(['cp', '-avr', '/usr/lib/python3/dist-packages/openplotterAvnav/data/OpenSeaMapsOnline', conf2.home + '/avnav/data/charts'])
+		subprocess.call(['cp', '-avr', '/usr/lib/python3/dist-packages/openplotterAvnav/data/avnav-avahi.service', '/etc/avahi/services'])
 
 		print(_('DONE'))
 	except Exception as e: print(_('FAILED: ')+str(e))
@@ -63,7 +64,7 @@ def main():
 	print(_('Setting version...'))
 	if platform.Platform().isInstalled('avnav'):
 		try:
-			conf2.set('APPS', 'avnav', version.version)
+			conf2.set('APPS', 'avnav', version)
 			print(_('DONE'))
 		except Exception as e: print(_('FAILED: ')+str(e))
 

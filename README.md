@@ -1,6 +1,6 @@
 ## openplotter-avnav
 
-OpenPlotter app to manage Avnav. 
+Avnav is a fast, web-based chart plotter that is optimized for touch screens
 
 #### Dependencies
 
@@ -18,7 +18,7 @@ Clone the repository:
 
 ```
 cd ~
-git clone https://github.com/e-sailing/openplotter-avnav.git
+git clone https://github.com/openplotter/openplotter-avnav.git
 ```
 
 (Make your changes and) create the package:

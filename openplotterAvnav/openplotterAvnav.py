@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 
 # This file is part of Openplotter.
-# Copyright (C) 2020 by Sailoog <https://github.com/openplotter>
-#                     e-sailing <https://github.com/e-sailing/openplotter-avnav>
+# Copyright (C) 2020 by Sailoog <https://github.com/openplotter/openplotter-sdr-vhf>
+# Copyright (C) 2020 by e-sailing <https://github.com/e-sailing/openplotter-sdr-vhf>
+#
 # Openplotter is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 2 of the License, or
@@ -15,9 +16,8 @@
 # You should have received a copy of the GNU General Public License
 # along with Openplotter. If not, see <http://www.gnu.org/licenses/>.
 
-import wx, os, webbrowser, subprocess, sys, time
+import wx, os, sys, webbrowser, subprocess, time
 import wx.richtext as rt
-
 from openplotterSettings import conf
 from openplotterSettings import language
 from openplotterSettings import platform
@@ -38,17 +38,11 @@ class CheckListCtrl(wx.ListCtrl, CheckListCtrlMixin, ListCtrlAutoWidthMixin):
 class MyFrame(wx.Frame):
 	def __init__(self):
 		self.conf = conf.Conf()
+		
 		self.platform = platform.Platform()
 		self.currentdir = os.path.dirname(os.path.abspath(__file__))
-		currentLanguage = self.conf.get('GENERAL', 'lang')
-		self.language = language.Language(self.currentdir,'openplotter-avnav',currentLanguage)
-
-		self.appsDict = []
-
-		if self.platform.skPort:
-			install = self.platform.admin+' python3 '+self.currentdir+'/installAvnav.py'
-			uninstall = self.platform.admin+' python3 '+self.currentdir+'/uninstallAvnav.py'			
-		self.avnavFoundUpdate()
+		self.currentLanguage = self.conf.get('GENERAL', 'lang')
+		self.language = language.Language(self.currentdir,'openplotter-avnav',self.currentLanguage)
 
 		if os.path.dirname(os.path.abspath(__file__))[0:4] == '/usr': 
 			v = version
@@ -66,42 +60,53 @@ class MyFrame(wx.Frame):
 		self.toolbar1 = wx.ToolBar(self, style=wx.TB_TEXT)
 		toolHelp = self.toolbar1.AddTool(101, _('Help'), wx.Bitmap(self.currentdir+"/data/help.png"))
 		self.Bind(wx.EVT_TOOL, self.OnToolHelp, toolHelp)
+		if not self.platform.isInstalled('openplotter-doc'): self.toolbar1.EnableTool(101,False)
 		toolSettings = self.toolbar1.AddTool(106, _('Settings'), wx.Bitmap(self.currentdir+"/data/settings.png"))
 		self.Bind(wx.EVT_TOOL, self.OnToolSettings, toolSettings)
 		self.toolbar1.AddSeparator()
-		self.refreshButton = self.toolbar1.AddTool(104, _('Refresh'), wx.Bitmap(self.currentdir+"/data/refresh.png"))
-		self.Bind(wx.EVT_TOOL, self.OnRefreshButton, self.refreshButton)
+		toolAvnav = self.toolbar1.AddTool(110, 'Avnan', wx.Bitmap(self.currentdir+"/data/sailboat24r.png"))
+		self.Bind(wx.EVT_TOOL, self.OnToolAvnav, toolAvnav)
 
 		self.notebook = wx.Notebook(self)
 		self.notebook.Bind(wx.EVT_NOTEBOOK_PAGE_CHANGED, self.onTabChange)
 		self.apps = wx.Panel(self.notebook)
 		self.systemd = wx.Panel(self.notebook)		
-		self.output = wx.Panel(self.notebook)
-		self.notebook.AddPage(self.apps, _('Apps'))
+		#self.output = wx.Panel(self.notebook)
 		self.notebook.AddPage(self.systemd, _('Processes'))
-		self.notebook.AddPage(self.output, '')
+		#self.notebook.AddPage(self.output, '')
 		self.il = wx.ImageList(24, 24)
-		img0 = self.il.Add(wx.Bitmap(self.currentdir+"/data/sailboat24r.png", wx.BITMAP_TYPE_PNG))
 		img1 = self.il.Add(wx.Bitmap(self.currentdir+"/data/process.png", wx.BITMAP_TYPE_PNG))
-		img2 = self.il.Add(wx.Bitmap(self.currentdir+"/data/output.png", wx.BITMAP_TYPE_PNG))
+		#img2 = self.il.Add(wx.Bitmap(self.currentdir+"/data/output.png", wx.BITMAP_TYPE_PNG))
 		self.notebook.AssignImageList(self.il)
-		self.notebook.SetPageImage(0, img0)
-		self.notebook.SetPageImage(1, img1)
-		self.notebook.SetPageImage(2, img2)
+		self.notebook.SetPageImage(0, img1)
+		#self.notebook.SetPageImage(1, img2)
 
 		vbox = wx.BoxSizer(wx.VERTICAL)
 		vbox.Add(self.toolbar1, 0, wx.EXPAND)
 		vbox.Add(self.notebook, 1, wx.EXPAND)
 		self.SetSizer(vbox)
 
-		self.pageApps()
+		self.appsDict = []
+		
+		app = {
+		'name': 'Avnav',
+		'included': True,
+		'show': '',
+		'service': ['avnav'],
+		'edit': True,
+		'install': '',
+		'uninstall': '',
+		}
+		self.appsDict.append(app)
+
 		self.pageSystemd()
-		self.pageOutput()
+		#self.pageOutput()
 
 		maxi = self.conf.get('GENERAL', 'maximize')
 		if maxi == '1': self.Maximize()
 		
-		self.Centre() 
+		self.Centre()
+		
 
 	def ShowStatusBar(self, w_msg, colour):
 		self.GetStatusBar().SetForegroundColour(colour)
@@ -131,224 +136,37 @@ class MyFrame(wx.Frame):
 	def OnToolSettings(self, event=0): 
 		subprocess.call(['pkill', '-f', 'openplotter-settings'])
 		subprocess.Popen('openplotter-settings')
-		
-	def avnavFoundUpdate(self): 
-		command = 'apt-cache search avnav'
-		output = subprocess.check_output(command.split(),universal_newlines=True)
 
-		edit = ''
-		install = ''
-		uninstall = ''
-		if self.platform.skPort:
-			install = self.platform.admin+' python3 '+self.currentdir+'/installAvnav.py'
-			uninstall = self.platform.admin+' python3 '+self.currentdir+'/uninstallAvnav.py'				
-
-		if 'avnav - avnav' in output:
-			self.appsDict = []
-			app = {
-			'name': 'Avnav',
-			'show': "http://localhost:8080",
-			'edit': edit,
-			'included': 'no',
-			'plugin': '',
-			'install': install,
-			'uninstall': uninstall,
-			'settings': 'http://localhost:8080',
-			}			
-			self.appsDict.append(app)
-
-	def pageApps(self):
-		self.listApps = wx.ListCtrl(self.apps, -1, style=wx.LC_REPORT | wx.LC_SINGLE_SEL | wx.LC_HRULES, size=(-1,200))
-		self.listApps.InsertColumn(0, _('Name'), width=320)
-		self.listApps.InsertColumn(1, _('status'), width=365)
-		self.listApps.Bind(wx.EVT_LIST_ITEM_SELECTED, self.onListAppsSelected)
-		self.listApps.Bind(wx.EVT_LIST_ITEM_DESELECTED, self.onListAppsDeselected)
-		self.listApps.SetTextColour(wx.BLACK)
-
-		self.toolbar2 = wx.ToolBar(self.apps, style=wx.TB_TEXT | wx.TB_VERTICAL)
-		self.settingsButton = self.toolbar2.AddTool(204, _('Settings'), wx.Bitmap(self.currentdir+"/data/settings2.png"))
-		self.Bind(wx.EVT_TOOL, self.OnSettingsButton, self.settingsButton)
-		self.showButton = self.toolbar2.AddTool(202, _('Show'), wx.Bitmap(self.currentdir+"/data/show.png"))
-		self.Bind(wx.EVT_TOOL, self.OnShowButton, self.showButton)
-		self.toolbar2.AddSeparator()
-		toolInstall= self.toolbar2.AddTool(203, _('Install'), wx.Bitmap(self.currentdir+"/data/install.png"))
-		self.Bind(wx.EVT_TOOL, self.OnToolInstall, toolInstall)
-		toolUninstall= self.toolbar2.AddTool(205, _('Uninstall'), wx.Bitmap(self.currentdir+"/data/uninstall.png"))
-		self.Bind(wx.EVT_TOOL, self.OnToolUninstall, toolUninstall)
-
-		self.toolbar3 = wx.ToolBar(self.apps, style=wx.TB_TEXT | wx.TB_VERTICAL)
-
-		sizer = wx.BoxSizer(wx.HORIZONTAL)
-		sizer.Add(self.listApps, 1, wx.EXPAND, 0)
-		sizer.Add(self.toolbar2, 0)
-		self.apps.SetSizer(sizer)
-
-		self.OnRefreshButton()
-
-	def onListAppsSelected(self, e):
-		i = e.GetIndex()
-		valid = e and i >= 0
-		if not valid: return
-		self.onListAppsDeselected()
-		if self.listApps.GetItemBackgroundColour(i) != (200,200,200):
-			self.toolbar2.EnableTool(203,True)
-			self.toolbar2.EnableTool(205,True)
-			apps = list(reversed(self.appsDict))
-			if apps[i]['settings']: self.toolbar2.EnableTool(204,True)
-			if apps[i]['edit']: self.toolbar2.EnableTool(201,True)
-			if apps[i]['show']: self.toolbar2.EnableTool(202,True)
-		else: self.toolbar2.EnableTool(203,True)
-
-	def onListAppsDeselected(self, event=0):
-		self.toolbar2.EnableTool(203,False)
-		self.toolbar2.EnableTool(205,False)
-		self.toolbar2.EnableTool(204,False)
-		self.toolbar2.EnableTool(201,False)
-		self.toolbar2.EnableTool(202,False)
-
-	def OnRefreshButton(self, event=0):
-		self.avnavFoundUpdate()
-		self.notebook.ChangeSelection(0)
-		self.listApps.DeleteAllItems()
-		for i in self.appsDict:
-			item = self.listApps.InsertItem(0, i['name'])
-			if self.platform.isInstalled((i['name']).lower()):
-				self.listApps.SetItem(item, 1, _('installed'))
-			else:
-				self.listApps.SetItem(item, 1, _('not installed'))
-				self.listApps.SetItemBackgroundColour(item,(200,200,200))
-		self.onListAppsDeselected()
-		try: self.set_listSystemd()
-		except: pass	
-
-	def OnToolInstall(self, e):
-		if self.platform.skPort:
-			index = self.listApps.GetFirstSelected()
-			if index == -1: return
-			apps = list(reversed(self.appsDict))
-			name = apps[index]['name']
-			command = apps[index]['install']
-			if not command:
-				self.ShowStatusBarRED(_('This app can not be installed'))
-				return
-			msg = _('Are you sure you want to install ')+name+_(' and its dependencies?')
-			dlg = wx.MessageDialog(None, msg, _('Question'), wx.YES_NO | wx.NO_DEFAULT | wx.ICON_EXCLAMATION)
-			if dlg.ShowModal() == wx.ID_YES:
-				self.logger.Clear()
-				self.notebook.ChangeSelection(2)
-				popen = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, universal_newlines=True, shell=True)
-				for line in popen.stdout:
-					if not 'Warning' in line and not 'WARNING' in line:
-						self.logger.WriteText(line)
-						self.ShowStatusBarYELLOW(_('Installing Avnav, please wait... ')+line)
-						self.logger.ShowPosition(self.logger.GetLastPosition())
-				self.OnRefreshButton()
-				#self.restart_SK(0)
-			dlg.Destroy()
-			self.goodEnd(self.platform.isInstalled(name.lower()))
-		else: 
-			self.ShowStatusBarRED(_('Please install "Signal K Installer" OpenPlotter app'))
-			self.OnToolSettings()
-
-	def OnToolUninstall(self, e):
-		index = self.listApps.GetFirstSelected()
-		if index == -1: return
-		apps = list(reversed(self.appsDict))
-		name = apps[index]['name']
-		command = apps[index]['uninstall']
-		if not command:
-			self.ShowStatusBarRED(_('This app can not be uninstalled'))
-			return
-		msg = _('Are you sure you want to uninstall ')+name+_(' and its dependencies?')
-		dlg = wx.MessageDialog(None, msg, _('Question'), wx.YES_NO | wx.NO_DEFAULT | wx.ICON_EXCLAMATION)
-		if dlg.ShowModal() == wx.ID_YES:
-			self.logger.Clear()
-			self.notebook.ChangeSelection(2)
-			popen = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, universal_newlines=True, shell=True)
-			for line in popen.stdout:
-				if not 'Warning' in line and not 'WARNING' in line:
-					self.logger.WriteText(line)
-					self.ShowStatusBarYELLOW(_('Uninstalling Avnav, please wait... ')+line)
-					self.logger.ShowPosition(self.logger.GetLastPosition())
-			self.OnRefreshButton()
-		dlg.Destroy()
-		self.goodEnd(not self.platform.isInstalled(name.lower()))
-
-	def goodEnd(self, status):
-		if status:
-			self.ShowStatusBarGREEN(_('DONE'))
-			wx.Sleep(1)
-			self.ShowStatusBarGREEN('')
-
-	def restart_SK(self, msg):
-		if msg == 0: msg = _('Restarting Signal K server... ')
-		seconds = 12
-		subprocess.call([self.platform.admin, 'python3', self.currentdir+'/service.py', 'restart'])
-		for i in range(seconds, 0, -1):
-			self.ShowStatusBarYELLOW(msg+str(i))
-			time.sleep(1)
-		self.ShowStatusBarGREEN(_('Signal K server restarted'))
-
-	def OnSettingsButton(self, e):
-		index = self.listApps.GetFirstSelected()
-		if index == -1: return
-		dlg = ProcessSetting(self,_('Process management for') + ' ' + self.appsDict[index]['name'] )
-		res = dlg.ShowModal()
-		dlg.Destroy()
-
-	def OnShowButton(self, e):
-		index = self.listApps.GetFirstSelected()
-		if index == -1: return
-		apps = list(reversed(self.appsDict))
-		webbrowser.open(apps[index]['show'], new=2)
-
-	def onListAppsSelected(self, e):
-		i = e.GetIndex()
-		valid = e and i >= 0
-		if not valid: return
-		self.onListAppsDeselected()
-		if self.listApps.GetItemBackgroundColour(i) != (200,200,200):
-			apps = list(reversed(self.appsDict))
-			if self.platform.isInstalled((apps[i]['name']).lower()):
-				self.toolbar2.EnableTool(205,True)
-			else:
-				self.toolbar2.EnableTool(203,True)
-			if apps[i]['settings']: self.toolbar2.EnableTool(204,True)
-			if apps[i]['show']: self.toolbar2.EnableTool(202,True)
-		else: self.toolbar2.EnableTool(203,True)
-
-	def onListAppsDeselected(self, event=0):
-		self.toolbar2.EnableTool(203,False)
-		self.toolbar2.EnableTool(205,False)
-		self.toolbar2.EnableTool(204,False)
-		self.toolbar2.EnableTool(202,False)
+	def OnToolAvnav(self, event):
+		url = "http://localhost:8080"
+		webbrowser.open(url, new=2)
 
 ################################################################################
 
 	def pageSystemd(self):
 		self.started = False
-		self.process = ['avnav']
 		self.aStatusList = [_('inactive'),_('active')]
 		self.bStatusList = [_('dead'),_('running')] 
 
 		self.listSystemd = CheckListCtrl(self.systemd, 152)
 		self.listSystemd.InsertColumn(0, _('Autostart'), width=90)
-		self.listSystemd.InsertColumn(1, _('Process'), width=150)
-		self.listSystemd.InsertColumn(2, _('Status'), width=150)
-		self.listSystemd.InsertColumn(3, '  ', width=150)
+		self.listSystemd.InsertColumn(1, _('App'), width=90)
+		self.listSystemd.InsertColumn(2, _('Process'), width=140)
+		self.listSystemd.InsertColumn(3, _('Status'), width=120)
+		self.listSystemd.InsertColumn(4, '  ', width=100)
 		self.listSystemd.Bind(wx.EVT_LIST_ITEM_SELECTED, self.onListSystemdSelected)
 		self.listSystemd.Bind(wx.EVT_LIST_ITEM_DESELECTED, self.onListSystemdDeselected)
 		self.listSystemd.SetTextColour(wx.BLACK)
-		
+
 		self.listSystemd.OnCheckItem = self.OnCheckItem
 
 		self.toolbar3 = wx.ToolBar(self.systemd, style=wx.TB_TEXT | wx.TB_VERTICAL)
-		self.start = self.toolbar3.AddTool(301, _('Start'), wx.Bitmap(self.currentdir+"/data/start.png"))
-		self.Bind(wx.EVT_TOOL, self.onStart, self.start)
-		self.stop = self.toolbar3.AddTool(302, _('Stop'), wx.Bitmap(self.currentdir+"/data/stop.png"))
-		self.Bind(wx.EVT_TOOL, self.onStop, self.stop)
-		self.restart = self.toolbar3.AddTool(303, _('Restart'), wx.Bitmap(self.currentdir+"/data/restart.png"))
-		self.Bind(wx.EVT_TOOL, self.onRestart, self.restart)	
+		start = self.toolbar3.AddTool(301, _('Start'), wx.Bitmap(self.currentdir+"/data/start.png"))
+		self.Bind(wx.EVT_TOOL, self.onStart, start)
+		stop = self.toolbar3.AddTool(302, _('Stop'), wx.Bitmap(self.currentdir+"/data/stop.png"))
+		self.Bind(wx.EVT_TOOL, self.onStop, stop)
+		restart = self.toolbar3.AddTool(303, _('Restart'), wx.Bitmap(self.currentdir+"/data/restart.png"))
+		self.Bind(wx.EVT_TOOL, self.onRestart, restart)	
 
 		sizer = wx.BoxSizer(wx.HORIZONTAL)
 		sizer.Add(self.listSystemd, 1, wx.EXPAND, 0)
@@ -372,59 +190,77 @@ class MyFrame(wx.Frame):
 		self.toolbar3.EnableTool(302,False)
 		self.toolbar3.EnableTool(303,False)
 
-	def set_listSystemd(self):
-		self.process = ['avnav']
-		#self.process = []
-		#if self.platform.isSKpluginInstalled('xxxx'):
-		#	self.process = ['xxxx']
+	def OnRefreshButton(self, event=0):
 		self.listSystemd.DeleteAllItems()
-		index = 1
-		for i in self.process:
-			if i:
-				index = self.listSystemd.InsertItem(sys.maxsize, '')
-				self.statusUpdate(i,index)
-		self.onListSystemdDeselected()
-				
+		self.started = False
+		self.set_listSystemd()
+		self.started = True
 
-	def statusUpdate(self, process, index): 
-		command = 'systemctl show ' + process + ' --no-page'
-		output = subprocess.check_output(command.split(),universal_newlines=True)
-		if 'UnitFileState=enabled' in output: self.listSystemd.CheckItem(index)
-		self.listSystemd.SetItem(index, 1, process)
-		self.listSystemd.SetItem(index, 2, self.aStatusList[('ActiveState=active' in output)*1])
-		self.listSystemd.SetItem(index, 3, self.bStatusList[('SubState=running' in output)*1])
+	def set_listSystemd(self):
+		apps = list(reversed(self.appsDict))
+		for i in apps:
+			if i['service']:
+				for ii in i['service']:
+					index = self.listSystemd.InsertItem(sys.maxsize, '')
+					self.listSystemd.SetItem(index, 1, i['name'])
+					self.listSystemd.SetItem(index, 2, ii)
+					command = 'systemctl show '+ii+' --no-page'
+					output = subprocess.check_output(command.split(),universal_newlines=True)
+				if 'UnitFileState=enabled' in output: self.listSystemd.CheckItem(index)
+		self.statusUpdate()
+
+	def statusUpdate(self):
+		listCount = range(self.listSystemd.GetItemCount())
+		for i in listCount:
+			service = self.listSystemd.GetItemText(i, 2)
+			command = 'systemctl show '+service+' --no-page'
+			output = subprocess.check_output(command.split(),universal_newlines=True)
+			if 'ActiveState=active' in output: self.listSystemd.SetItem(i, 3, _('active'))
+			else: self.listSystemd.SetItem(i, 3, _('inactive'))
+			if 'SubState=running' in output: 
+				self.listSystemd.SetItem(i, 4, _('running'))
+				self.listSystemd.SetItemBackgroundColour(i,(0,255,0))
+			else: 
+				self.listSystemd.SetItem(i, 4, _('dead'))
+				self.listSystemd.SetItemBackgroundColour(i,(-1,-1,-1))
+
 						
 	def onStart(self,e):
 		index = self.listSystemd.GetFirstSelected()
 		if index == -1: return
 		self.ShowStatusBarYELLOW(_('Starting process...'))
-		subprocess.call((self.platform.admin + ' systemctl start ' + self.process[index]).split())
+		subprocess.call((self.platform.admin + ' systemctl start ' + self.listSystemd.GetItemText(index, 2)).split())
+		time.sleep(1)
+		self.OnRefreshButton()
 		self.ShowStatusBarGREEN(_('Done'))
-		self.set_listSystemd()
 
 	def onStop(self,e):
 		index = self.listSystemd.GetFirstSelected()
 		if index == -1: return
 		self.ShowStatusBarYELLOW(_('Stopping process...'))
-		subprocess.call((self.platform.admin + ' systemctl stop ' + self.process[index]).split())
+		subprocess.call((self.platform.admin + ' systemctl stop ' + self.listSystemd.GetItemText(index, 2)).split())
+		time.sleep(1)
+		self.OnRefreshButton()
 		self.ShowStatusBarGREEN(_('Done'))
-		self.set_listSystemd()
 
 	def onRestart(self,e):
 		index = self.listSystemd.GetFirstSelected()
 		if index == -1: return
 		self.ShowStatusBarYELLOW(_('Restarting process...'))
-		subprocess.call((self.platform.admin + ' systemctl restart ' + self.process[index]).split())
+		subprocess.call((self.platform.admin + ' systemctl restart ' + self.listSystemd.GetItemText(index, 2)).split())
+		time.sleep(1)
+		self.OnRefreshButton()
 		self.ShowStatusBarGREEN(_('Done'))
-		self.set_listSystemd()
 		
 	def OnCheckItem(self, index, flag):
 		if not self.started: return
+		self.ShowStatusBarYELLOW(_('Enabling/Disabling process...'))
 		if flag:
-			subprocess.call((self.platform.admin + ' systemctl enable ' + self.process[index]).split())
+			subprocess.call((self.platform.admin + ' systemctl enable ' + self.listSystemd.GetItemText(index, 2)).split())
 		else:
-			subprocess.call((self.platform.admin + ' systemctl disable ' + self.process[index]).split())
-		#self.set_listSystemd()
+			subprocess.call((self.platform.admin + ' systemctl disable ' + self.listSystemd.GetItemText(index, 2)).split())
+		self.OnRefreshButton()
+		self.ShowStatusBarGREEN(_('Done'))
 
 ################################################################################
 
@@ -437,6 +273,13 @@ class MyFrame(wx.Frame):
 		self.output.SetSizer(sizer)
 
 def main():
+	try:
+		platform2 = platform.Platform()
+		if not platform2.postInstall(version,'avnav'): 
+			subprocess.Popen(['openplotterPostInstall', platform2.admin+' avPostInstall'])
+			return
+	except: pass
+
 	app = wx.App()
 	MyFrame().Show()
 	time.sleep(1)

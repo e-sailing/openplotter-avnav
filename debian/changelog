@@ -1,4 +1,11 @@
-openplotter-avnav (2.0.0-dev) bionic; urgency=medium
+openplotter-avnav (2.0.1-beta) bionic; urgency=medium
+
+  * Fix errors
+  * Added avahi support
+
+ -- Sailoog <info@sailoog.com>  Mon, 19 May 2020 19:16:37 +0200
+
+openplotter-sdr-vhf (2.0.0-dev) bionic; urgency=medium
 
   * Release Candidate
 
