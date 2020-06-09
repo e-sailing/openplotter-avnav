@@ -32,7 +32,7 @@ def main():
 		print(_('Install app...'))
 		platform2 = platform.Platform()
 
-		subprocess.call(['apt', '-y', 'install', 'avnav'])
+		subprocess.call(['apt', '-y', 'install', 'avnav', 'avnav-ocharts-plugin', 'avnav-oesenc'])
 		
 		print(_('DONE'))
 	except Exception as e: print(_('FAILED: ')+str(e))
