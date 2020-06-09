@@ -1,3 +1,9 @@
+openplotter-avnav (2.0.2-beta) bionic; urgency=medium
+
+  * Add oCharts
+
+ -- e-sailing <e.minus.sailing@gmail.com>  Tue, 09 Jun 2020 20:53:17 +0200
+
 openplotter-avnav (2.0.1-beta) bionic; urgency=medium
 
   * Fix errors
