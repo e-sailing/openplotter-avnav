@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 
 # This file is part of Openplotter.
-# Copyright (C) 2020 by Sailoog <https://github.com/openplotter/openplotter-sdr-vhf>
-# Copyright (C) 2020 by e-sailing <https://github.com/e-sailing/openplotter-sdr-vhf>
+# Copyright (C) 2020 by Sailoog <https://github.com/openplotter/openplotter-avnav>
+# Copyright (C) 2020 by e-sailing <https://github.com/e-sailing/openplotter-avnav>
 #
 # Openplotter is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -18,6 +18,7 @@
 
 import wx, os, sys, webbrowser, subprocess, time
 import wx.richtext as rt
+from xml.etree import ElementTree as et
 from openplotterSettings import conf
 from openplotterSettings import language
 from openplotterSettings import platform
@@ -61,24 +62,33 @@ class MyFrame(wx.Frame):
 		toolHelp = self.toolbar1.AddTool(101, _('Help'), wx.Bitmap(self.currentdir+"/data/help.png"))
 		self.Bind(wx.EVT_TOOL, self.OnToolHelp, toolHelp)
 		if not self.platform.isInstalled('openplotter-doc'): self.toolbar1.EnableTool(101,False)
-		toolSettings = self.toolbar1.AddTool(106, _('Settings'), wx.Bitmap(self.currentdir+"/data/settings.png"))
+		toolSettings = self.toolbar1.AddTool(102, _('Settings'), wx.Bitmap(self.currentdir+"/data/settings.png"))
 		self.Bind(wx.EVT_TOOL, self.OnToolSettings, toolSettings)
 		self.toolbar1.AddSeparator()
 		toolAvnav = self.toolbar1.AddTool(110, 'Avnan', wx.Bitmap(self.currentdir+"/data/sailboat24r.png"))
 		self.Bind(wx.EVT_TOOL, self.OnToolAvnav, toolAvnav)
+		self.toolbar1.AddSeparator()
+		toolApply = self.toolbar1.AddTool(105, _('Apply Changes'), wx.Bitmap(self.currentdir+"/data/apply.png"))
+		self.Bind(wx.EVT_TOOL, self.OnToolApply, toolApply)
+		toolCancel = self.toolbar1.AddTool(106, _('Cancel Changes'), wx.Bitmap(self.currentdir+"/data/cancel.png"))
+		self.Bind(wx.EVT_TOOL, self.OnToolCancel, toolCancel)
 
 		self.notebook = wx.Notebook(self)
 		self.notebook.Bind(wx.EVT_NOTEBOOK_PAGE_CHANGED, self.onTabChange)
 		self.apps = wx.Panel(self.notebook)
-		self.systemd = wx.Panel(self.notebook)		
+		self.settings = wx.Panel(self.notebook)
+		self.systemd = wx.Panel(self.notebook)
 		#self.output = wx.Panel(self.notebook)
+		self.notebook.AddPage(self.settings, _('Settings'))
 		self.notebook.AddPage(self.systemd, _('Processes'))
 		#self.notebook.AddPage(self.output, '')
 		self.il = wx.ImageList(24, 24)
+		img0 = self.il.Add(wx.Bitmap(self.currentdir+"/data/settings2.png", wx.BITMAP_TYPE_PNG))
 		img1 = self.il.Add(wx.Bitmap(self.currentdir+"/data/process.png", wx.BITMAP_TYPE_PNG))
 		#img2 = self.il.Add(wx.Bitmap(self.currentdir+"/data/output.png", wx.BITMAP_TYPE_PNG))
 		self.notebook.AssignImageList(self.il)
-		self.notebook.SetPageImage(0, img1)
+		self.notebook.SetPageImage(0, img0)
+		self.notebook.SetPageImage(1, img1)
 		#self.notebook.SetPageImage(1, img2)
 
 		vbox = wx.BoxSizer(wx.VERTICAL)
@@ -99,12 +109,17 @@ class MyFrame(wx.Frame):
 		}
 		self.appsDict.append(app)
 
+		self.xmlDocFile = self.conf.home +'/avnav/data/avnav_server.xml'
+		self.xmlDoc = et.ElementTree(file=self.xmlDocFile)
+		self.AVNport = int(self.xmlDoc.find('.//AVNHttpServer').attrib['httpPort'])
+
+		self.pageSettings()
 		self.pageSystemd()
 		#self.pageOutput()
 
 		maxi = self.conf.get('GENERAL', 'maximize')
 		if maxi == '1': self.Maximize()
-		
+
 		self.Centre()
 		
 
@@ -138,8 +153,77 @@ class MyFrame(wx.Frame):
 		subprocess.Popen('openplotter-settings')
 
 	def OnToolAvnav(self, event):
-		url = "http://localhost:8080"
+		url = "http://localhost:"+str(self.AVNport)
 		webbrowser.open(url, new=2)
+
+	def OnToolApply(self,e):
+		msg = _('Only port settings will be changed. Are you sure?')
+		dlg = wx.MessageDialog(None, msg, _('Question'), wx.YES_NO | wx.NO_DEFAULT | wx.ICON_EXCLAMATION)
+		if dlg.ShowModal() == wx.ID_YES:
+			self.AVNport = str(self.port.GetValue())
+			self.xmlDoc.find('.//AVNHttpServer').attrib['httpPort'] = self.AVNport
+			self.xmlDoc.write(self.xmlDocFile)
+			#change avahi
+			subprocess.call(self.platform.admin + ' python3 '+self.currentdir+'/changeAvahiPort.py ' + self.AVNport, shell=True)
+			#xmlFile = '/etc/avahi/services/avnav-avahi.service'
+			#xmlDoc = et.ElementTree(file=xmlFile)
+			#xmlDoc.find('.//port').text = self.AVNport
+			#xmlDoc.write(xmlFile)
+
+			self.ShowStatusBarYELLOW(_('Configuring AVNAV port, please wait... '))
+			self.onRestart(0)
+			self.refreshSettings()
+			self.ShowStatusBarYELLOW('')
+		dlg.Destroy()
+
+	def OnToolCancel(self,e):
+		self.refreshSettings()
+
+
+################################################################################
+
+	def pageSettings(self):
+		portLabel = wx.StaticText(self.settings, label=_('Port'))
+		self.port = wx.SpinCtrl(self.settings, 101, min=80, max=65536, initial=self.AVNport)
+		self.port.Bind(wx.EVT_SPINCTRL, self.onPort)
+		portText1 = wx.StaticText(self.settings, label=_('The AVNAV default port is 8080'))
+		portText2 = wx.StaticText(self.settings, label=_('Port 80 does not require ":8080" in browsers and app interfaces'))
+
+		hbox = wx.BoxSizer(wx.HORIZONTAL)
+		hbox.Add(portLabel, 0, wx.UP | wx.EXPAND, 5)
+		hbox.Add(self.port, 0, wx.LEFT | wx.EXPAND, 10)
+
+		vbox = wx.BoxSizer(wx.VERTICAL)
+		vbox.AddSpacer(20)
+		vbox.Add(hbox, 0, wx.LEFT | wx.EXPAND, 20)
+		vbox.AddSpacer(5)
+		vbox.Add(portText1, 0, wx.LEFT | wx.EXPAND, 20)
+		vbox.AddSpacer(5)
+		vbox.Add(portText2, 0, wx.LEFT | wx.EXPAND, 20)
+		vbox.AddStretchSpacer(1)
+
+		self.settings.SetSizer(vbox)
+
+		self.refreshSettings()
+
+	def refreshSettings(self):
+		self.platform = platform.Platform()
+		self.notebook.ChangeSelection(1)
+		#if self.platform.skPort: self.port.SetValue(int(self.platform.skPort))
+		self.toolbar1.EnableTool(105,False)
+		self.toolbar1.EnableTool(106,False)
+
+	def restart_SK(self, msg):
+		if msg == 0: msg = _('Restarting AVNAV... ')
+		seconds = 12
+		for i in range(seconds, 0, -1):
+			self.ShowStatusBarYELLOW(msg+str(i))
+			time.sleep(1)
+		self.ShowStatusBarGREEN(_('AVNAV server restarted'))
+
+	def onPort(self, e):
+		self.toolbar1.EnableTool(105,True)
+		self.toolbar1.EnableTool(106,True)
 
 ################################################################################
 

@@ -1,3 +1,9 @@
+openplotter-avnav (2.0.3-beta) bionic; urgency=medium
+
+  * Add menu to change port 
+
+ -- e-sailing <e.minus.sailing@gmail.com>  Tue, 17 Nov 2020 11:05:17 +0100
+
 openplotter-avnav (2.0.2-beta) bionic; urgency=medium
 
   * Add oCharts
