@@ -10,6 +10,6 @@ X-Python3-Version: >= 3.2
 Package: openplotter-avnav
 Architecture: all
 Multi-Arch: foreign
-Depends: ${misc:Depends}, ${python3:Depends}, python3-lxml, openplotter-settings, openplotter-signalk-installer
+Depends: ${misc:Depends}, ${python3:Depends}, openplotter-settings, openplotter-signalk-installer
 Description: Avnav is a fast, web-based chart plotter that is optimized for touch screens
  OpenPlotter app to manage avnav
