@@ -18,7 +18,8 @@
 
 import wx, os, sys, webbrowser, subprocess, time
 import wx.richtext as rt
-from xml.etree import ElementTree as et
+#from xml.etree import ElementTree as et
+import lxml.etree as et
 from openplotterSettings import conf
 from openplotterSettings import language
 from openplotterSettings import platform
@@ -108,11 +109,19 @@ class MyFrame(wx.Frame):
 		'uninstall': '',
 		}
 		self.appsDict.append(app)
-
+		self.OSENCport = 8082
+		self.AVNport = 8080
 		self.xmlDocFile = self.conf.home +'/avnav/data/avnav_server.xml'
-		self.xmlDoc = et.ElementTree(file=self.xmlDocFile)
-		self.AVNport = int(self.xmlDoc.find('.//AVNHttpServer').attrib['httpPort'])
-
+		self.xmlload = False
+		if os.path.exists(self.xmlDocFile):
+			self.xmlDoc = et.ElementTree(file=self.xmlDocFile)
+			self.xmlload = True
+			self.AVNport = int(self.xmlDoc.find('.//AVNHttpServer').attrib['httpPort'] or 8080)
+			if (self.xmlDoc.find('.//system-ocharts')!=None): 
+				self.OSENCport = int(self.xmlDoc.find('.//system-ocharts').attrib['port'] or 8082)
+			else:
+				self.OSENCport = 8082
+		
 		self.pageSettings()
 		self.pageSystemd()
 		#self.pageOutput()
@@ -157,11 +166,29 @@ class MyFrame(wx.Frame):
 		webbrowser.open(url, new=2)
 
 	def OnToolApply(self,e):
+		if not self.xmlload:
+			self.ShowStatusBarRED(_('There is no configuration file. Please restart start avnav process.'))
+			return
+        
 		msg = _('Only port settings will be changed. Are you sure?')
 		dlg = wx.MessageDialog(None, msg, _('Question'), wx.YES_NO | wx.NO_DEFAULT | wx.ICON_EXCLAMATION)
 		if dlg.ShowModal() == wx.ID_YES:
 			self.AVNport = str(self.port.GetValue())
+			self.OSENCport = str(self.port_osenc.GetValue())
+
 			self.xmlDoc.find('.//AVNHttpServer').attrib['httpPort'] = self.AVNport
+			if self.xmlDoc.find('.//AVNPluginHandler') == None:
+				a=et.fromstring('<AVNPluginHandler/>')
+				self.xmlDoc.getroot().append(a)
+				
+			a = self.xmlDoc.find('.//AVNPluginHandler')
+			if a.find('.//system-ocharts') == None:
+				b=et.fromstring('<system-ocharts/>')
+				a.append(b)
+				
+			b = a.find('.//system-ocharts')
+			b.attrib['port'] = self.OSENCport
+
 			self.xmlDoc.write(self.xmlDocFile)
 			#change avahi
 			subprocess.call(self.platform.admin + ' python3 '+self.currentdir+'/changeAvahiPort.py ' + self.AVNport, shell=True)
@@ -189,9 +216,18 @@ class MyFrame(wx.Frame):
 		portText1 = wx.StaticText(self.settings, label=_('The AVNAV default port is 8080'))
 		portText2 = wx.StaticText(self.settings, label=_('Port 80 does not require ":8080" in browsers and app interfaces'))
 
+		portLabel2 = wx.StaticText(self.settings, label=_('Port'))
+		self.port_osenc = wx.SpinCtrl(self.settings, 101, min=80, max=65536, initial=self.OSENCport)
+		self.port_osenc.Bind(wx.EVT_SPINCTRL, self.onPort_osenc)
+		portText3 = wx.StaticText(self.settings, label=_('The AVNAV osenc process default port is 8082'))
+
 		hbox = wx.BoxSizer(wx.HORIZONTAL)
 		hbox.Add(portLabel, 0, wx.UP | wx.EXPAND, 5)
 		hbox.Add(self.port, 0, wx.LEFT | wx.EXPAND, 10)
+
+		hbox2 = wx.BoxSizer(wx.HORIZONTAL)
+		hbox2.Add(portLabel2, 0, wx.UP | wx.EXPAND, 5)
+		hbox2.Add(self.port_osenc, 0, wx.LEFT | wx.EXPAND, 10)
 
 		vbox = wx.BoxSizer(wx.VERTICAL)
 		vbox.AddSpacer(20)
@@ -200,6 +236,9 @@ class MyFrame(wx.Frame):
 		vbox.Add(portText1, 0, wx.LEFT | wx.EXPAND, 20)
 		vbox.AddSpacer(5)
 		vbox.Add(portText2, 0, wx.LEFT | wx.EXPAND, 20)
+		vbox.AddSpacer(20)
+		vbox.Add(hbox2, 0, wx.LEFT | wx.EXPAND, 20)
+		vbox.Add(portText3, 0, wx.LEFT | wx.EXPAND, 20)
 		vbox.AddStretchSpacer(1)
 
 		self.settings.SetSizer(vbox)
@@ -222,6 +261,10 @@ class MyFrame(wx.Frame):
 		self.ShowStatusBarGREEN(_('AVNAV server restarted'))
 
 	def onPort(self, e):
+		self.toolbar1.EnableTool(105,True)
+		self.toolbar1.EnableTool(106,True)
+
+	def onPort_osenc(self, e):
 		self.toolbar1.EnableTool(105,True)
 		self.toolbar1.EnableTool(106,True)
 
