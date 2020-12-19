@@ -26,6 +26,7 @@ setup (
 	author="Sailoog/e-sailing",
 	author_email='info@sailoog.com',
 	url='https://github.com/openplotter/openplotter-avnav',
+        install_requires=['lxml'],
 	packages=['openplotterAvnav'],
 	classifiers = ['Natural Language :: English',
 	'Operating System :: POSIX :: Linux',
