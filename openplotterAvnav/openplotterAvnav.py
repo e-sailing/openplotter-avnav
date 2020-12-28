@@ -116,11 +116,16 @@ class MyFrame(wx.Frame):
 		if os.path.exists(self.xmlDocFile):
 			self.xmlDoc = et.ElementTree(file=self.xmlDocFile)
 			self.xmlload = True
-			self.AVNport = int(self.xmlDoc.find('.//AVNHttpServer').attrib['httpPort'] or 8080)
-			if (self.xmlDoc.find('.//system-ocharts')!=None): 
-				self.OSENCport = int(self.xmlDoc.find('.//system-ocharts').attrib['port'] or 8082)
-			else:
-				self.OSENCport = 8082
+
+			AVNHttpS = self.xmlDoc.find('.//AVNHttpServer')
+			if AVNHttpS!=None:
+				if 'httpPort' in AVNHttpS.attrib:
+					self.AVNport = int(AVNHttpS.attrib['httpPort'] or 8080)
+
+			sys_ocharts = self.xmlDoc.find('.//system-ocharts')
+			if sys_ocharts!=None:
+				if 'port' in sys_ocharts.attrib:
+					self.OSENCport = int(sys_ocharts.attrib['port'] or 8082)
 		
 		self.pageSettings()
 		self.pageSystemd()
