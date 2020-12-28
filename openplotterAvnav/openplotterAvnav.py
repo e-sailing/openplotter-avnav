@@ -66,7 +66,7 @@ class MyFrame(wx.Frame):
 		toolSettings = self.toolbar1.AddTool(102, _('Settings'), wx.Bitmap(self.currentdir+"/data/settings.png"))
 		self.Bind(wx.EVT_TOOL, self.OnToolSettings, toolSettings)
 		self.toolbar1.AddSeparator()
-		toolAvnav = self.toolbar1.AddTool(110, 'Avnan', wx.Bitmap(self.currentdir+"/data/sailboat24r.png"))
+		toolAvnav = self.toolbar1.AddTool(110, 'Avnav', wx.Bitmap(self.currentdir+"/data/sailboat24r.png"))
 		self.Bind(wx.EVT_TOOL, self.OnToolAvnav, toolAvnav)
 		self.toolbar1.AddSeparator()
 		toolApply = self.toolbar1.AddTool(105, _('Apply Changes'), wx.Bitmap(self.currentdir+"/data/apply.png"))
