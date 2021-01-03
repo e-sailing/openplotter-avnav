@@ -30,6 +30,7 @@ def main():
 
 	print(_('Removing avnav service...'))
 	try:
+		editSettings.EditSettings().removeConnection('fromAvnav')
 		subprocess.call(['systemctl', 'disable', 'avnav'])
 		subprocess.call(['systemctl', 'stop', 'avnav'])
 		if os.path.isfile('/usr/lib/systemd/system/avnav.service.d/avnav.conf'):

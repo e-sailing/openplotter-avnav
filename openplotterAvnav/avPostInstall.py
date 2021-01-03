@@ -22,15 +22,37 @@ from openplotterSettings import language
 from openplotterSettings import platform
 from .version import version
 
+
+def addSKconnection(port,platform,id):
+	if platform.skDir:
+		from openplotterSignalkInstaller import editSettings
+		skSettings = editSettings.EditSettings()
+		ID = id
+		if 'pipedProviders' in skSettings.data:
+			for i in skSettings.data['pipedProviders']:
+				try:
+					if ID in i['id']:
+						skSettings.removeConnection(i['id'])
+					elif port:
+						if i['pipeElements'][0]['options']['type'] == 'NMEA0183':
+							if i['pipeElements'][0]['options']['subOptions']['type'] == 'udp':
+								if i['pipeElements'][0]['options']['subOptions']['port'] == str(port):
+									ID = i['id']
+				except Exception as e:
+					print(str(e))
+		if ID == id:
+			if port: skSettings.setNetworkConnection(ID, 'NMEA0183', 'TCP', 'localhost', str(port))
+
+
 def main():
 	conf2 = conf.Conf()
 	currentdir = os.path.dirname(os.path.abspath(__file__))
 	currentLanguage = conf2.get('GENERAL', 'lang')
 	language.Language(currentdir,'openplotter-avnav',currentLanguage)
 
+	platform2 = platform.Platform()
 	try:
 		print(_('Install app...'))
-		platform2 = platform.Platform()
 
 		subprocess.call(['apt', '-y', 'install', 'avnav', 'avnav-ocharts-plugin', 'avnav-oesenc'])
 		
@@ -57,6 +79,8 @@ def main():
 		subprocess.call(['systemctl', 'enable', 'avnav'])
 		subprocess.call(['systemctl', 'restart', 'avnav'])
 		subprocess.call(['cp', '-avr', '/usr/lib/python3/dist-packages/openplotterAvnav/data/avnav-avahi.service', '/etc/avahi/services'])
+
+		addSKconnection(28628, platform2, 'fromAvnav')
 
 		print(_('DONE'))
 	except Exception as e: print(_('FAILED: ')+str(e))

@@ -307,6 +307,7 @@ class MyFrame(wx.Frame):
 		self.systemd.SetSizer(sizer)
 
 		self.set_listSystemd()
+		self.onListSystemdDeselected()
 		self.started = True
 
 	def onListSystemdSelected(self, e):

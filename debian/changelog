@@ -1,3 +1,9 @@
+openplotter-avnav (2.0.6-beta) bionic; urgency=medium
+
+  * Add connection to signal k 
+
+ -- e-sailing <e.minus.sailing@gmail.com>  Sun, 03 Jan 2021 09:46:07 +0100
+
 openplotter-avnav (2.0.5-beta) bionic; urgency=medium
 
   * fix error (read sys-osenc port)
