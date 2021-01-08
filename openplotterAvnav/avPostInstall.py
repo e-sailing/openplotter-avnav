@@ -16,7 +16,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Openplotter. If not, see <http://www.gnu.org/licenses/>.
 
-import os, subprocess
+import os, sys, subprocess
 from openplotterSettings import conf
 from openplotterSettings import language
 from openplotterSettings import platform
@@ -48,9 +48,53 @@ def main():
 	conf2 = conf.Conf()
 	currentdir = os.path.dirname(os.path.abspath(__file__))
 	currentLanguage = conf2.get('GENERAL', 'lang')
-	language.Language(currentdir,'openplotter-avnav',currentLanguage)
-
+	package = 'openplotter-avnav'
+	language.Language(currentdir, package, currentLanguage)
 	platform2 = platform.Platform()
+
+	app = {
+	'name': 'Avnav',
+	'platform': 'both',
+	'package': package,
+	'preUninstall': platform2.admin+' avPreUninstall',
+	'uninstall': 'openplotter-avnav',
+	'sources': ['https://www.free-x.de/deb4op'],
+	'dev': 'no',
+	'entryPoint': 'openplotter-avnav',
+	'postInstall': platform2.admin+' avPostInstall',
+	'reboot': 'no',
+	'module': 'openplotterAvnav',
+	'conf': 'avnav'	
+	}
+	#gpgKey = currentdir+'/data/myapp.gpg.key' ### replace by the path to your gpg key file. Replace contents of this file by your key.
+	#sourceList = currentdir+'/data/myapp.list' ### replace by the path to your sources list file. Replace contents of this file by your packages sources.
+
+	print(_('Adding app to OpenPlotter...'))
+	try:
+		externalApps1 = []
+		try:
+			externalApps0 = eval(conf2.get('APPS', 'external_apps'))
+		except: externalApps0 = []
+		for i in externalApps0:
+			if i['package'] != package: externalApps1.append(i)
+		externalApps1.append(app)
+		conf2.set('APPS', 'external_apps', str(externalApps1))
+		print(_('DONE'))
+	except Exception as e: print(_('FAILED: ')+str(e))
+
+	#print(_('Checking sources...'))
+	#try:
+	#	sources = subprocess.check_output('apt-cache policy', shell=True).decode(sys.stdin.encoding)
+	#	exists = True
+	#	for i in app['sources']:
+	#		if not i in sources: exists = False
+	#	if not exists:
+	#		os.system('cp '+sourceList+' /etc/apt/sources.list.d')
+	#		os.system('apt-key add - < '+gpgKey)
+	#		os.system('apt update')
+	#	print(_('DONE'))
+	#except Exception as e: print(_('FAILED: ')+str(e))
+
 	try:
 		print(_('Install app...'))
 
@@ -86,11 +130,10 @@ def main():
 	except Exception as e: print(_('FAILED: ')+str(e))
 
 	print(_('Setting version...'))
-	if platform.Platform().isInstalled('avnav'):
-		try:
-			conf2.set('APPS', 'avnav', version)
-			print(_('DONE'))
-		except Exception as e: print(_('FAILED: ')+str(e))
+	try:
+		conf2.set('APPS', 'avnav', version)
+		print(_('DONE'))
+	except Exception as e: print(_('FAILED: ')+str(e))
 
 if __name__ == '__main__':
 	main()
