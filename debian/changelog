@@ -1,3 +1,9 @@
+openplotter-avnav (2.0.8-beta) bionic; urgency=medium
+
+  * Add avnav-history-plugin
+
+ -- e-sailing <e.minus.sailing@gmail.com>  Fri, 15 Jan 2021 20:17:35 +0100
+
 openplotter-avnav (2.0.7-beta) bionic; urgency=medium
 
   * Add to openplotter-settings 
