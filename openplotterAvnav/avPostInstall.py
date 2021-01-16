@@ -98,7 +98,7 @@ def main():
 	try:
 		print(_('Install app...'))
 
-		subprocess.call(['apt', '-y', 'install', 'avnav', 'avnav-ocharts-plugin', 'avnav-oesenc'])
+		subprocess.call(['apt', '-y', 'install', 'avnav', 'avnav-ocharts-plugin', 'avnav-oesenc', 'avnav-history-plugin'])
 		
 		print(_('DONE'))
 	except Exception as e: print(_('FAILED: ')+str(e))
