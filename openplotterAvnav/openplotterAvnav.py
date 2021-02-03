@@ -111,6 +111,7 @@ class MyFrame(wx.Frame):
 		self.appsDict.append(app)
 		self.OSENCport = 8082
 		self.AVNport = 8080
+		self.updatePort = 8085
 		self.xmlDocFile = self.conf.home +'/avnav/data/avnav_server.xml'
 		self.xmlload = False
 		if os.path.exists(self.xmlDocFile):
@@ -120,12 +121,21 @@ class MyFrame(wx.Frame):
 			AVNHttpS = self.xmlDoc.find('.//AVNHttpServer')
 			if AVNHttpS!=None:
 				if 'httpPort' in AVNHttpS.attrib:
-					self.AVNport = int(AVNHttpS.attrib['httpPort'] or 8080)
-
+					try:
+						self.AVNport = int(AVNHttpS.attrib['httpPort'] or 8080)
+					except: pass
 			sys_ocharts = self.xmlDoc.find('.//system-ocharts')
 			if sys_ocharts!=None:
 				if 'port' in sys_ocharts.attrib:
-					self.OSENCport = int(sys_ocharts.attrib['port'] or 8082)
+					try:
+						self.OSENCport = int(sys_ocharts.attrib['port'] or 8082)
+					except: pass
+			output = subprocess.check_output(['grep','-F','Environment=PORT=','/etc/systemd/system/avnavupdater.service.d/override.conf']).decode("utf-8").split('=')
+			if len(output) == 3:
+				try:
+					self.updatePort = int(output[2])
+				except: pass
+
 		
 		self.pageSettings()
 		self.pageSystemd()
@@ -180,6 +190,7 @@ class MyFrame(wx.Frame):
 		if dlg.ShowModal() == wx.ID_YES:
 			self.AVNport = str(self.port.GetValue())
 			self.OSENCport = str(self.port_osenc.GetValue())
+			self.updatePort = str(self.port_update.GetValue())
 
 			self.xmlDoc.find('.//AVNHttpServer').attrib['httpPort'] = self.AVNport
 			if self.xmlDoc.find('.//AVNPluginHandler') == None:
@@ -197,10 +208,13 @@ class MyFrame(wx.Frame):
 			self.xmlDoc.write(self.xmlDocFile)
 			#change avahi
 			subprocess.call(self.platform.admin + ' python3 '+self.currentdir+'/changeAvahiPort.py ' + self.AVNport, shell=True)
-			#xmlFile = '/etc/avahi/services/avnav-avahi.service'
-			#xmlDoc = et.ElementTree(file=xmlFile)
-			#xmlDoc.find('.//port').text = self.AVNport
-			#xmlDoc.write(xmlFile)
+			#change menu
+			output = subprocess.check_output(['grep','-F','Exec=','/usr/share/applications/avnav.desktop']).decode("utf-8")
+			subprocess.call(self.platform.admin + ' sed -i "s#'+output[0:-1]+'#Exec=x-www-browser http://localhost:'+self.AVNport+'#g" /usr/share/applications/avnav.desktop', shell=True)
+			#change avnav-updater
+			output = subprocess.check_output(['grep','-F','Environment=PORT=','/etc/systemd/system/avnavupdater.service.d/override.conf']).decode("utf-8")
+			subprocess.call(self.platform.admin + ' sed -i "s|'+output[0:-1]+'|Environment=PORT='+self.updatePort+'|g" /etc/systemd/system/avnavupdater.service.d/override.conf', shell=True)
+			
 
 			self.ShowStatusBarYELLOW(_('Configuring AVNAV port, please wait... '))
 			self.onRestart(0)
@@ -224,7 +238,12 @@ class MyFrame(wx.Frame):
 		portLabel2 = wx.StaticText(self.settings, label=_('Port'))
 		self.port_osenc = wx.SpinCtrl(self.settings, 101, min=80, max=65536, initial=self.OSENCport)
 		self.port_osenc.Bind(wx.EVT_SPINCTRL, self.onPort_osenc)
-		portText3 = wx.StaticText(self.settings, label=_('The AVNAV osenc process default port is 8082'))
+		portText3 = wx.StaticText(self.settings, label=_('The AVNAV osenc plugin default port is 8082'))
+
+		portLabel3 = wx.StaticText(self.settings, label=_('Port'))
+		self.port_update = wx.SpinCtrl(self.settings, 101, min=80, max=65536, initial=self.updatePort)
+		self.port_update.Bind(wx.EVT_SPINCTRL, self.onPort_update)
+		portText4 = wx.StaticText(self.settings, label=_('The AVNAV update plugin default port is 8085'))
 
 		hbox = wx.BoxSizer(wx.HORIZONTAL)
 		hbox.Add(portLabel, 0, wx.UP | wx.EXPAND, 5)
@@ -233,6 +252,10 @@ class MyFrame(wx.Frame):
 		hbox2 = wx.BoxSizer(wx.HORIZONTAL)
 		hbox2.Add(portLabel2, 0, wx.UP | wx.EXPAND, 5)
 		hbox2.Add(self.port_osenc, 0, wx.LEFT | wx.EXPAND, 10)
+
+		hbox3 = wx.BoxSizer(wx.HORIZONTAL)
+		hbox3.Add(portLabel3, 0, wx.UP | wx.EXPAND, 5)
+		hbox3.Add(self.port_update, 0, wx.LEFT | wx.EXPAND, 10)
 
 		vbox = wx.BoxSizer(wx.VERTICAL)
 		vbox.AddSpacer(20)
@@ -243,7 +266,12 @@ class MyFrame(wx.Frame):
 		vbox.Add(portText2, 0, wx.LEFT | wx.EXPAND, 20)
 		vbox.AddSpacer(20)
 		vbox.Add(hbox2, 0, wx.LEFT | wx.EXPAND, 20)
+		vbox.AddSpacer(5)
 		vbox.Add(portText3, 0, wx.LEFT | wx.EXPAND, 20)
+		vbox.AddSpacer(20)
+		vbox.Add(hbox3, 0, wx.LEFT | wx.EXPAND, 20)
+		vbox.AddSpacer(5)
+		vbox.Add(portText4, 0, wx.LEFT | wx.EXPAND, 20)
 		vbox.AddStretchSpacer(1)
 
 		self.settings.SetSizer(vbox)
@@ -270,6 +298,10 @@ class MyFrame(wx.Frame):
 		self.toolbar1.EnableTool(106,True)
 
 	def onPort_osenc(self, e):
+		self.toolbar1.EnableTool(105,True)
+		self.toolbar1.EnableTool(106,True)
+
+	def onPort_update(self, e):
 		self.toolbar1.EnableTool(105,True)
 		self.toolbar1.EnableTool(106,True)
 

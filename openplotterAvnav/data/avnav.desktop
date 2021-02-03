@@ -1,7 +1,7 @@
 [Desktop Entry]
-Name=Avnav Installer
-Exec=openplotter-avnav
-Icon=sailboat48rinstall
+Name=Avnav
+Exec=x-www-browser http://localhost:8080
+Icon=sailboat48r
 StartupNotify=true
 Terminal=false
 Type=Application

@@ -33,5 +33,5 @@ setup (
 	'Programming Language :: Python :: 3'],
 	include_package_data=True,
 	entry_points={'console_scripts': ['openplotter-avnav=openplotterAvnav.openplotterAvnav:main','avPostInstall=openplotterAvnav.avPostInstall:main','avPreUninstall=openplotterAvnav.avPreUninstall:main']},
-	data_files=[('share/applications', ['openplotterAvnav/data/openplotter-avnav.desktop']),('share/pixmaps', ['openplotterAvnav/data/sailboat24r.png']),],
+	data_files=[('share/applications', ['openplotterAvnav/data/openplotter-avnav.desktop','openplotterAvnav/data/avnav.desktop']),('share/pixmaps', ['openplotterAvnav/data/sailboat24r.png','openplotterAvnav/data/sailboat48r.png','openplotterAvnav/data/sailboat48rinstall.png']),],
 	)
