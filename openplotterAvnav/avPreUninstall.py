@@ -50,7 +50,7 @@ def main():
 
 	print(_('Removing avnav...'))
 	try:
-		subprocess.call(['apt', '-y', 'autoremove', 'avnav', 'avnav-ocharts-plugin', 'avnav-oesenc', 'avnav-history-plugin','avnav-update-plugin'])
+		subprocess.call(['apt', '-y', 'autoremove', 'avnav', 'avnav-ocharts-plugin', 'avnav-oesenc', 'avnav-history-plugin','avnav-update-plugin','avnav-mapproxy-plugin'])
 		print(_('DONE'))
 	except Exception as e: print(_('FAILED: ')+str(e))
 

@@ -1,9 +1,15 @@
+openplotter-avnav (2.1.1-beta) bionic; urgency=medium
+
+  * Add avnav-mapproxy-plugin
+
+ -- e-sailing <e.minus.sailing@gmail.com>  Fri, 12 Feb 2021 10:10:02 +0100
+
 openplotter-avnav (2.1.0-beta) bionic; urgency=medium
 
   * Change icons to Avnav -> Browser, Avnav Installer -> this
   * Add avnav-update-plugin
 
- -- e-sailing <e.minus.sailing@gmail.com>  Fri, 02 Feb 2021 10:10:02 +0100
+ -- e-sailing <e.minus.sailing@gmail.com>  Tue, 02 Feb 2021 10:10:02 +0100
 
 openplotter-avnav (2.0.8-beta) bionic; urgency=medium
 
