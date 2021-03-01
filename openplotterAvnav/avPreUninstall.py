@@ -30,7 +30,6 @@ def main():
 
 	print(_('Removing avnav service...'))
 	try:
-		editSettings.EditSettings().removeConnection('fromAvnav')
 		subprocess.call(['systemctl', 'disable', 'avnav'])
 		subprocess.call(['systemctl', 'stop', 'avnav'])
 		if os.path.isfile('/usr/lib/systemd/system/avnav.service.d/avnav.conf'):
@@ -43,8 +42,8 @@ def main():
 	print(_('Removing SignalK avnav connection...'))
 	try:
 		skSettings = editSettings.EditSettings()
-		if skSettings.connectionIdExists('AvnavOut'):
-			skSettings.removeConnection('AvnavOut')			
+		if skSettings.connectionIdExists('fromAvnav'):
+			skSettings.removeConnection('fromAvnav')			
 		print(_('DONE'))
 	except Exception as e: print(_('FAILED: ')+str(e))
 

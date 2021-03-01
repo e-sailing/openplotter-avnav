@@ -21,6 +21,7 @@ from openplotterSettings import conf
 from openplotterSettings import language
 from openplotterSettings import platform
 from .version import version
+import lxml.etree as et
 
 
 def addSKconnection(port,platform,id):
@@ -69,7 +70,7 @@ def main():
 	#gpgKey = currentdir+'/data/myapp.gpg.key' ### replace by the path to your gpg key file. Replace contents of this file by your key.
 	#sourceList = currentdir+'/data/myapp.list' ### replace by the path to your sources list file. Replace contents of this file by your packages sources.
 
-	print(_('Adding app to OpenPlotter...'))
+	print(_('Check for old app in OpenPlotter...'))
 	try:
 		externalApps1 = []
 		try:
@@ -77,7 +78,7 @@ def main():
 		except: externalApps0 = []
 		for i in externalApps0:
 			if i['package'] != package: externalApps1.append(i)
-		externalApps1.append(app)
+		#externalApps1.append(app)
 		conf2.set('APPS', 'external_apps', str(externalApps1))
 		print(_('DONE'))
 	except Exception as e: print(_('FAILED: ')+str(e))
@@ -105,6 +106,7 @@ def main():
 		
 		
 	try:
+	#if True:
 		print(_('Editing config files...'))
 		if not os.path.isdir('/usr/lib/systemd/system/avnav.service.d'):
 			os.makedirs('/usr/lib/systemd/system/avnav.service.d')
@@ -119,11 +121,36 @@ def main():
 		fo = open('/usr/lib/systemd/system/avnav.service.d/avnav.conf', "w")
 		fo.write(data)
 		fo.close()
+		
 		subprocess.call(['systemctl', 'daemon-reload'])
 		subprocess.call(['systemctl', 'enable', 'avnav'])
 		subprocess.call(['systemctl', 'restart', 'avnav'])
 		subprocess.call(['cp', '-avr', '/usr/lib/python3/dist-packages/openplotterAvnav/data/avnav-avahi.service', '/etc/avahi/services'])
 
+		#default to port 8080 if you use pypilot you should change this port
+		AVNport = 8080
+		xmlDocFile = conf2.home +'/avnav/data/avnav_server.xml'
+		xmlload = False
+		if os.path.exists(xmlDocFile):
+			xmlDoc = et.ElementTree(file=xmlDocFile)
+			xmlload = True
+
+			AVNHttpS = xmlDoc.find('.//AVNHttpServer')
+			if AVNHttpS!=None:
+				if 'httpPort' in AVNHttpS.attrib:
+					try:
+						AVNport = int(AVNHttpS.attrib['httpPort'] or 8080)
+					except: pass
+		
+		#change avahi
+		subprocess.call(platform2.admin + ' python3 '+currentdir+'/changeAvahiPort.py ' + str(AVNport), shell=True)
+		#change menu
+		output = subprocess.check_output(['grep','-F','Exec=','/usr/share/applications/avnav.desktop']).decode("utf-8")
+		subprocess.call(platform2.admin + ' sed -i "s#'+output[0:-1]+'#Exec=x-www-browser http://localhost:'+str(AVNport)+'#g" /usr/share/applications/avnav.desktop', shell=True)
+		
+		subprocess.call(['systemctl', 'daemon-reload'])
+		subprocess.call(['systemctl', 'restart', 'avnav'])
+		
 		addSKconnection(28628, platform2, 'fromAvnav')
 
 		print(_('DONE'))
