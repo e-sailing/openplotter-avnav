@@ -107,7 +107,7 @@
 -->
 <AVNCommandHandler >
 	<Command name="shutdown" command="sudo shutdown -P"/>
-	<Command name="sound" command="/bin/sh $BASEDIR/../raspberry/sound.sh 90%" repeat="1"/>
+	<Command name="sound" command="/usr/lib/python3/dist-packages/openplotterAvnav/data/sound.sh 90%" repeat="1"/>
 </AVNCommandHandler>
 
 </Workers>

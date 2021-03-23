@@ -100,6 +100,17 @@ class MyFrame(wx.Frame):
 		self.appsDict = []
 		
 		app = {
+		'name': 'AvnavUpdater',
+		'included': True,
+		'show': '',
+		'service': ['avnavupdater'],
+		'edit': True,
+		'install': '',
+		'uninstall': '',
+		}
+		self.appsDict.append(app)		
+		
+		app = {
 		'name': 'Avnav',
 		'included': True,
 		'show': '',
@@ -109,6 +120,7 @@ class MyFrame(wx.Frame):
 		'uninstall': '',
 		}
 		self.appsDict.append(app)
+		
 		self.OSENCport = 8082
 		self.AVNport = 8080
 		self.updatePort = 8085
@@ -205,6 +217,8 @@ class MyFrame(wx.Frame):
 			b = a.find('.//system-ocharts')
 			b.attrib['port'] = self.OSENCport
 
+			self.ShowStatusBarYELLOW(_('Configuring AVNAV port, please wait... '))
+
 			self.xmlDoc.write(self.xmlDocFile)
 			#change avahi
 			subprocess.call(self.platform.admin + ' python3 '+self.currentdir+'/changeAvahiPort.py ' + self.AVNport, shell=True)
@@ -215,9 +229,10 @@ class MyFrame(wx.Frame):
 			output = subprocess.check_output(['grep','-F','Environment=PORT=','/etc/systemd/system/avnavupdater.service.d/override.conf']).decode("utf-8")
 			subprocess.call(self.platform.admin + ' sed -i "s|'+output[0:-1]+'|Environment=PORT='+self.updatePort+'|g" /etc/systemd/system/avnavupdater.service.d/override.conf', shell=True)
 			
-
-			self.ShowStatusBarYELLOW(_('Configuring AVNAV port, please wait... '))
-			self.onRestart(0)
+			listCount = range(self.listSystemd.GetItemCount())
+			for i in listCount:
+				self.onRestart(i)
+			time.sleep(2)
 			self.refreshSettings()
 			self.ShowStatusBarYELLOW('')
 		dlg.Destroy()

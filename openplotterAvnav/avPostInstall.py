@@ -121,12 +121,23 @@ def main():
 		fo = open('/usr/lib/systemd/system/avnav.service.d/avnav.conf', "w")
 		fo.write(data)
 		fo.close()
-		
-		subprocess.call(['systemctl', 'daemon-reload'])
-		subprocess.call(['systemctl', 'enable', 'avnav'])
-		subprocess.call(['systemctl', 'restart', 'avnav'])
-		subprocess.call(['cp', '-avr', '/usr/lib/python3/dist-packages/openplotterAvnav/data/avnav-avahi.service', '/etc/avahi/services'])
+	except Exception as e: print(_('FAILED: ')+str(e))
 
+	try:
+		print(_('Setup avnav directory...'))
+		subprocess.call(['systemctl', 'daemon-reload'])
+	except: pass
+	try:
+		subprocess.call(['systemctl', 'enable', 'avnav'])
+	except: pass
+	try:
+		subprocess.call(['systemctl', 'restart', 'avnav'])
+	except: pass
+	try:
+		subprocess.call(['cp', '-avr', '/usr/lib/python3/dist-packages/openplotterAvnav/data/avnav-avahi.service', '/etc/avahi/services'])
+	except: pass
+	try:
+		print(_('Setup avnav ports...'))
 		#default to port 8080 if you use pypilot you should change this port
 		AVNport = 8080
 		xmlDocFile = conf2.home +'/avnav/data/avnav_server.xml'
@@ -141,6 +152,16 @@ def main():
 					try:
 						AVNport = int(AVNHttpS.attrib['httpPort'] or 8080)
 					except: pass
+
+		soundSh= '/usr/lib/avnav/raspberry/sound.sh'
+		raspberryDir = os.path.dirname(soundSh)
+		if not os.path.exists(soundSh):
+			if not os.path.exists(raspberryDir):
+				os.makedirs(raspberryDir)
+			try:
+				os.symlink(os.path.abspath(os.path.join(os.path.dirname(__file__), 'data','sound.sh')),soundSh)
+			except:
+				pass
 		
 		#change avahi
 		subprocess.call(platform2.admin + ' python3 '+currentdir+'/changeAvahiPort.py ' + str(AVNport), shell=True)
@@ -150,7 +171,10 @@ def main():
 		
 		subprocess.call(['systemctl', 'daemon-reload'])
 		subprocess.call(['systemctl', 'restart', 'avnav'])
-		
+	except: pass
+	try:
+		print(_('Setup NMEA0183 (Avnav->Signal K) for Autopilot (RMB)...'))
+
 		addSKconnection(28628, platform2, 'fromAvnav')
 
 		print(_('DONE'))
