@@ -221,7 +221,7 @@ class MyFrame(wx.Frame):
 
 			self.xmlDoc.write(self.xmlDocFile)
 			#change avahi
-			subprocess.call(self.platform.admin + ' python3 '+self.currentdir+'/changeAvahiPort.py ' + self.AVNport, shell=True)
+            #subprocess.call(self.platform.admin + ' python3 '+self.currentdir+'/changeAvahiPort.py ' + self.AVNport, shell=True)
 			#change menu
 			output = subprocess.check_output(['grep','-F','Exec=','/usr/share/applications/avnav.desktop']).decode("utf-8")
 			subprocess.call(self.platform.admin + ' sed -i "s#'+output[0:-1]+'#Exec=x-www-browser http://localhost:'+self.AVNport+'#g" /usr/share/applications/avnav.desktop', shell=True)

@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="UTF-8" ?>
-<AVNServer >
+<?xml version="1.0" ?><AVNServer>
 <!-- some basic configuration
      debugToLog controls whether any debug output will also go to the logfile
      you can change the loglevel by an HTTP request to the navurl:
@@ -9,14 +8,7 @@
      systimediff: timediff in seconds between gps timestamp and system time that we allow before we set gps time
      settimeperiod: time in seconds befor we retry setting the systemtime
 -->
-<AVNConfig debug="0" 
-	logfile="/home/pi/avnav/data/log/avnav.log" 
-	debugToLog="true"
-	maxtimeback="5"
-	settimecmd=""
-    systimediff="5"
-	expiryTime="300"
-    settimeperiod="3600"/>
+<AVNConfig debug="0" logfile="/home/pi/avnav/data/log/avnav.log" debugToLog="true" maxtimeback="5" settimecmd="" systimediff="5" expiryTime="300" settimeperiod="3600"/>
 <!-- the workers section -->
 <Workers>
 <AVNGpsdFeeder useGpsd="false" listenerPort="4020" port="2948" gpsdcommand="/usr/sbin/gpsd -b -n -N -G"/>
@@ -35,12 +27,12 @@
      this of course must fit to the java script part...
 -->
 <AVNHttpServer navurl="/viewer/avnav_navi.php" index="/viewer/avnav_viewer.html" httpPort="8080">
-	<Directory urlpath="maps" path="/home/pi/avnav/data/charts"></Directory>
-	<Directory urlpath="log" path="/home/pi/avnav/data/log"></Directory>
-	<Directory urlpath="tracks" path="/home/pi/avnav/data/tracks"></Directory>
-	<Directory urlpath="routes" path="/home/pi/avnav/data/routes"></Directory>
-	<MimeType extension=".avt" type="text/plain"></MimeType>
-	<MimeType extension=".log" type="text/plain"></MimeType>
+	<Directory urlpath="maps" path="/home/pi/avnav/data/charts"/>
+	<Directory urlpath="log" path="/home/pi/avnav/data/log"/>
+	<Directory urlpath="tracks" path="/home/pi/avnav/data/tracks"/>
+	<Directory urlpath="routes" path="/home/pi/avnav/data/routes"/>
+	<MimeType extension=".avt" type="text/plain"/>
+	<MimeType extension=".log" type="text/plain"/>
 </AVNHttpServer>
 <!-- the writer for track data
      tracks are written in a simple file
@@ -86,13 +78,13 @@
 </AVNPluginHandler>
 
 <!-- create chart overview files -->
-<AVNChartHandler></AVNChartHandler>
+<AVNChartHandler/>
 <!--  routing handler 
       additional parameters:
       interval: interval in seconds for computing RMB data (default: 5)
       computeRMB: default True, set to false if you do not want RMB computation
 -->
-<AVNRouter routesdir="/home/pi/avnav/data/routes"></AVNRouter>
+<AVNRouter routesdir="/home/pi/avnav/data/routes"/>
 <!-- log nmea data
      will create .nmea(.gz) files in the tracks directory
      parameters:
@@ -100,15 +92,18 @@
      filter: the filter for the sentences to be written, default "$RMC,$DBT,$DBP" - suitable to help openseamap by logging depth
      interval: minimal interval in seconds between sentences of the same type (default: 5)
 -->
-<AVNNmeaLogger></AVNNmeaLogger>
-<AVNImporter importDir="/home/pi/avnav/data/import"></AVNImporter>
+<AVNNmeaLogger/>
+<AVNImporter importDir="/home/pi/avnav/data/import"/>
 <!-- add the following property to AVNWpaHandler to be able to allow external access for wlan client
      firewallCommand="sudo -n $BASEDIR/../raspberry/iptables-ext.sh wlan-av1"
 -->
-<AVNCommandHandler >
+<AVNCommandHandler>
 	<Command name="shutdown" command="sudo shutdown -P"/>
 	<Command name="sound" command="/usr/lib/python3/dist-packages/openplotterAvnav/data/sound.sh 90%" repeat="1"/>
 </AVNCommandHandler>
 
 </Workers>
+<AVNUserAppHandler><UserTool icon="/user/images/kip.png" url="http://$HOST:3000/@mxtommy/kip/#/page/0" newWindow="false" keepUrl="True" name="2e2771f5a0007cfacfe9f765d65e19b0" title="KIP dashboard"/>
+<UserTool icon="/user/images/openplotter-48.png" title="openplotter browser settings" url="http://$HOST:8080/plugins/openplotter" newWindow="false" keepUrl="True" name="5a8e144b5cc5449afdc264c96b487aff"/>
+</AVNUserAppHandler>
 </AVNServer>

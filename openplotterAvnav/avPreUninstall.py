@@ -49,7 +49,29 @@ def main():
 
 	print(_('Removing avnav...'))
 	try:
-		subprocess.call(['apt', '-y', 'autoremove', 'avnav', 'avnav-ocharts-plugin', 'avnav-oesenc', 'avnav-history-plugin','avnav-update-plugin','avnav-mapproxy-plugin'])
+		if os.path.isfile('/usr/lib/avnav/viewer/layout/openplotter.json'):
+			os.remove('/usr/lib/avnav/viewer/layout/openplotter.json')
+			os.remove('/usr/lib/avnav/viewer/layout/original_default.json')
+	except Exception as e: print(_('FAILED: ')+str(e))
+	try:
+		if os.path.isfile('/usr/lib/avnav/server/plugins/openplotter/index.html'):
+			os.remove('/usr/lib/avnav/server/plugins/openplotter/index.html')
+			os.rmdir('/usr/lib/avnav/server/plugins/openplotter')
+	except Exception as e: print(_('FAILED: ')+str(e))
+	try:
+		subprocess.call(['apt', '-y', 'autoremove', 'avnav'])
+	except Exception as e: print(_('FAILED: ')+str(e))
+	try:
+		subprocess.call(['apt', '-y', 'autoremove', 'avnav-history-plugin', 'avnav-update-plugin'])
+	except Exception as e: print(_('FAILED: ')+str(e))
+	try:
+		subprocess.call(['apt', '-y', 'autoremove', 'avnav-mapproxy-plugin'])
+	except Exception as e: print(_('FAILED: ')+str(e))
+	try:
+		subprocess.call(['apt', '-y', 'autoremove', 'avnav-ocharts-plugin'])
+	except Exception as e: print(_('FAILED: ')+str(e))
+	try:
+		subprocess.call(['apt', '-y', 'autoremove', 'avnav-ocharts'])
 		print(_('DONE'))
 	except Exception as e: print(_('FAILED: ')+str(e))
 

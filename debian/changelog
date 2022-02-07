@@ -1,3 +1,10 @@
+openplotter-avnav (3.0.0-beta) bullseye; urgency=medium
+
+  * new version for v3.x.x
+  * fix avnav.service
+
+ -- e-sailing <e.minus.sailing@gmail.com>  Tue, 28 Jan 2022 15:29:04 +0100
+
 openplotter-avnav (2.1.4-stable) bionic; urgency=medium
 
   * add avnavupdater process

@@ -16,7 +16,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Openplotter. If not, see <http://www.gnu.org/licenses/>.
 
-import os, sys, subprocess
+import os, sys, subprocess, time
 from openplotterSettings import conf
 from openplotterSettings import language
 from openplotterSettings import platform
@@ -96,14 +96,34 @@ def main():
 	#	print(_('DONE'))
 	#except Exception as e: print(_('FAILED: ')+str(e))
 
-	try:
-		print(_('Install app...'))
+	print(_('Install app...'))
 
-		subprocess.call(['apt', '-y', 'install', 'avnav', 'avnav-ocharts-plugin', 'avnav-oesenc', 'avnav-history-plugin', 'avnav-update-plugin', 'avnav-mapproxy-plugin'])
-		
+	cssFile = conf2.home +'/avnav/data/user/viewer/user.css'
+	cssExists = os.path.exists(cssFile)
+
+	try:
+		subprocess.call(['apt', '-y', 'install', 'avnav'])
+	except Exception as e: print(_('FAILED: ')+str(e))
+	try:
+		subprocess.call(['apt', '-y', 'install', 'avnav-history-plugin', 'avnav-update-plugin'])
+	except Exception as e: print(_('FAILED: ')+str(e))
+	try:
+		subprocess.call(['apt', '-y', 'install', 'avnav-mapproxy-plugin'])
+	except Exception as e: print(_('FAILED: ')+str(e))
+	try:
+		subprocess.call(['apt', '-y', 'install', 'avnav-ocharts-plugin'])
+	except Exception as e: print(_('FAILED: ')+str(e))
+	try:
+		subprocess.call(['apt', '-y', 'install', 'avnav-ocharts'])
+	except Exception as e: print(_('FAILED: ')+str(e))
+
+	try:
+		subprocess.call(['mv', '/usr/lib/avnav/viewer/layout/default.json', '/usr/lib/avnav/viewer/layout/original_default.json'])
+		subprocess.call(['cp', '-av', '/usr/lib/python3/dist-packages/openplotterAvnav/data/openplotter.json', '/usr/lib/avnav/viewer/layout'])
+		subprocess.call(['cp', '-av', '/usr/lib/python3/dist-packages/openplotterAvnav/data/openplotter.json', '/usr/lib/avnav/viewer/layout/default.json'])
+
 		print(_('DONE'))
 	except Exception as e: print(_('FAILED: ')+str(e))
-		
 		
 	try:
 	#if True:
@@ -111,31 +131,36 @@ def main():
 		if not os.path.isdir('/usr/lib/systemd/system/avnav.service.d'):
 			os.makedirs('/usr/lib/systemd/system/avnav.service.d')
 		
-		data = '[Service]\n'
+		data = '[Unit]\n'
+		data+= 'Description=Browser based navigation (chart plotter)\n'
+		data+= 'After=syslog.target network.target\n\n'
+		data+= '[Service]\n'
 		data+= 'User=pi\n'
 		data+= 'ExecStart=\n'
-		data+= 'ExecStart=/usr/bin/avnav -q -b ' + conf2.home + '/avnav/data -t /usr/lib/python3/dist-packages/openplotterAvnav/data/avnav_server.xml\n'
-		data+= '[Unit]\n'
+		data+= 'ExecStart=/usr/bin/avnav -q -b ' + conf2.home + '/avnav/data -t /usr/lib/python3/dist-packages/openplotterAvnav/data/avnav_server.xml\n\n'
+		data+= '[Install]\n'
 		data+= 'WantedBy=multi-user.target\n'
 
 		fo = open('/usr/lib/systemd/system/avnav.service.d/avnav.conf', "w")
 		fo.write(data)
 		fo.close()
+		
+		subprocess.call(['cp', '-av', '/usr/lib/python3/dist-packages/openplotterAvnav/data/signalk.service', '/etc/systemd/system'])
 	except Exception as e: print(_('FAILED: ')+str(e))
 
 	try:
 		print(_('Setup avnav directory...'))
 		subprocess.call(['systemctl', 'daemon-reload'])
-	except: pass
+	except Exception as e: print(_('FAILED: ')+str(e))
 	try:
 		subprocess.call(['systemctl', 'enable', 'avnav'])
-	except: pass
+	except Exception as e: print(_('FAILED: ')+str(e))
 	try:
 		subprocess.call(['systemctl', 'restart', 'avnav'])
-	except: pass
-	try:
-		subprocess.call(['cp', '-avr', '/usr/lib/python3/dist-packages/openplotterAvnav/data/avnav-avahi.service', '/etc/avahi/services'])
-	except: pass
+	except Exception as e: print(_('FAILED: ')+str(e))
+	#try:
+	#	subprocess.call(['cp', '-avr', '/usr/lib/python3/dist-packages/openplotterAvnav/data/avnav-avahi.service', '/etc/avahi/services'])
+	#except: pass
 	try:
 		print(_('Setup avnav ports...'))
 		#default to port 8080 if you use pypilot you should change this port
@@ -164,14 +189,33 @@ def main():
 				pass
 		
 		#change avahi
-		subprocess.call(platform2.admin + ' python3 '+currentdir+'/changeAvahiPort.py ' + str(AVNport), shell=True)
+		#subprocess.call(platform2.admin + ' python3 '+currentdir+'/changeAvahiPort.py ' + str(AVNport), shell=True)
 		#change menu
 		output = subprocess.check_output(['grep','-F','Exec=','/usr/share/applications/avnav.desktop']).decode("utf-8")
 		subprocess.call(platform2.admin + ' sed -i "s#'+output[0:-1]+'#Exec=x-www-browser http://localhost:'+str(AVNport)+'#g" /usr/share/applications/avnav.desktop', shell=True)
 		
 		subprocess.call(['systemctl', 'daemon-reload'])
 		subprocess.call(['systemctl', 'restart', 'avnav'])
-	except: pass
+	except Exception as e: print(_('FAILED: ')+str(e))
+	try:
+		if not cssExists:
+			while not os.path.exists(cssFile):
+				time.sleep(0.1)
+
+			subprocess.call(['cp', '/usr/lib/python3/dist-packages/openplotterAvnav/data/user.css', cssFile])
+	except Exception as e: print(_('FAILED: ')+str(e))
+
+	try:
+		subprocess.call(['cp', '/usr/lib/python3/dist-packages/openplotterAvnav/data/kip.png', conf2.home +'/avnav/data/user/images'])
+		subprocess.call(['cp', '/usr/lib/python3/dist-packages/openplotterAvnav/data/openplotter-48.png', conf2.home +'/avnav/data/user/images'])
+	except Exception as e: print(_('FAILED: ')+str(e))
+
+	try:
+		subprocess.call(['cp', '/usr/lib/python3/dist-packages/openplotterAvnav/data/openplotter.json', '/usr/lib/avnav/viewer/layout'])
+		subprocess.call(['mkdir', '-p', '/usr/lib/avnav/server/plugins/openplotter'])
+		subprocess.call(['cp', '/usr/lib/python3/dist-packages/openplotterAvnav/data/index.html', '/usr/lib/avnav/server/plugins/openplotter'])
+	except Exception as e: print(_('FAILED: ')+str(e))
+
 	try:
 		print(_('Setup NMEA0183 (Avnav->Signal K) for Autopilot (RMB)...'))
 
