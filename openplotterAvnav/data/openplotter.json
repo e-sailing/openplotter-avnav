@@ -1,0 +1,388 @@
+{
+  "description": "The system default layout. No keys and no properties.",
+  "layoutVersion": 1,
+  "properties": {
+    "layers": {
+      "ais": true
+    }
+  },
+  "widgets": {
+    "gpspage1": {
+      "left": [
+        {
+          "name": "BRG",
+          "weight": 1.5
+        },
+        {
+          "name": "DST",
+          "weight": 1.5
+        },
+        {
+          "name": "XteDisplay",
+          "compareState": true,
+          "weight": 1
+        },
+        {
+          "name": "ETA"
+        },
+        {
+          "name": "RteCombine"
+        }
+      ],
+      "left_anchor": [
+        {
+          "name": "AnchorBearing",
+          "weight": 1.5
+        },
+        {
+          "name": "AnchorDistance",
+          "weight": 1.5
+        },
+        {
+          "name": "AnchorWatchDistance"
+        },
+        {
+          "name": "DepthDisplay"
+        },
+        {
+          "name": "Empty"
+        }
+      ],
+      "right": [
+        {
+          "name": "COG",
+          "weight": 1.5
+        },
+        {
+          "name": "SOG",
+          "weight": 1.5
+        },
+        {
+          "name": "TimeStatus"
+        },
+        {
+          "name": "Position"
+        },
+        {
+          "name": "AisTarget"
+        }
+      ]
+    },
+    "gpspage2": {
+      "left": [
+        {
+          "name": "BRG",
+          "weight": 1.5
+        },
+        {
+          "name": "DST",
+          "weight": 0.75
+        },
+        {
+          "name": "SOG",
+          "weight": 0.75
+        },
+        {
+          "name": "DepthDisplay"
+        },
+        {
+          "name": "ETA"
+        },
+        {
+          "name": "RteCombine"
+        }
+      ],
+      "left_anchor": [
+        {
+          "name": "AnchorBearing",
+          "weight": 1.5
+        },
+        {
+          "name": "AnchorDistance",
+          "weight": 1.5
+        },
+        {
+          "name": "AnchorWatchDistance"
+        },
+        {
+          "name": "DepthDisplay"
+        },
+        {
+          "name": "Empty"
+        }
+      ],
+      "right": [
+        {
+          "name": "COG",
+          "weight": 1.5
+        },
+        {
+          "name": "WindGraphics",
+          "weight": 2.5
+        },
+        {
+          "name": "DateTime"
+        },
+        {
+          "name": "AisTarget"
+        }
+      ]
+    },
+    "gpspage3": {
+      "left": [
+        {
+          "name": "BRG",
+          "caption": "BRG",
+          "unit": "°",
+          "formatterParameters": [
+            ""
+          ]
+        },
+        {
+          "name": "COG",
+          "caption": "COG",
+          "unit": "°",
+          "formatterParameters": [
+            ""
+          ]
+        },
+        {
+          "name": "linGauge_Compass",
+          "caption": "COG",
+          "unit": "°",
+          "storeKeys": {
+            "value": "nav.gps.course"
+          },
+          "formatterParameters": [
+            ""
+          ]
+        },
+        {
+          "name": "radGauge_Compass",
+          "caption": "COG",
+          "unit": "°",
+          "storeKeys": {
+            "value": "nav.gps.course"
+          },
+          "formatterParameters": [
+            ""
+          ],
+          "drawValue": true,
+          "valueFontFactor": 12,
+          "weight": 3
+        }
+      ],
+      "right": [
+        {
+          "name": "Default",
+          "caption": "OwnName",
+          "unit": "",
+          "formatter": "formatString",
+          "default": "???",
+          "storeKeys": {
+            "value": "nav.gps.signalk.name"
+          }
+        },
+        {
+          "name": "Default",
+          "caption": "OwnType",
+          "unit": "",
+          "formatter": "formatString",
+          "default": "???",
+          "storeKeys": {
+            "value": "nav.gps.signalk.design.aisShipType.name"
+          }
+        },
+        {
+          "name": "signalKCelsius",
+          "className": "skWaterTemp",
+          "caption": "TempWater",
+          "storeKeys": {
+            "value": "nav.gps.signalk.environment.water.temperature"
+          }
+        },
+        {
+          "name": "signalKCelsius",
+          "className": "skOutTemp",
+          "caption": "TempOut",
+          "storeKeys": {
+            "value": "nav.gps.signalk.environment.outside.temperature"
+          }
+        },
+        {
+          "name": "signalKCelsius",
+          "className": "skInTemp",
+          "caption": "TempIn",
+          "storeKeys": {
+            "value": "nav.gps.signalk.environment.inside.temperature"
+          }
+        },
+        {
+          "name": "signalKCelsius",
+          "className": "skCoolTemp",
+          "caption": "TempCool",
+          "storeKeys": {
+            "value": "nav.gps.signalk.environment.inside.refrigerator.temperature"
+          }
+        },
+        {
+          "name": "signalKPressureHpa",
+          "caption": "Pressure",
+          "default": "???",
+          "storeKeys": {
+            "value": "nav.gps.signalk.environment.outside.pressure"
+          }
+        }
+      ]
+    },
+    "navpage": {
+      "left": [
+        {
+          "name": "Zoom"
+        },
+        {
+          "name": "CenterDisplay"
+        },
+        {
+          "show360": false,
+          "name": "WindGraphics"
+        },
+        {
+          "name": "AisTarget"
+        },
+        {
+          "name": "ActiveRoute"
+        },
+        {
+          "name": "LargeTime"
+        }
+      ],
+      "left_small": [
+        {
+          "name": "ActiveRoute"
+        }
+      ],
+      "top_small": [
+        {
+          "name": "WindDisplay"
+        },
+        {
+          "name": "DepthDisplay"
+        },
+        {
+          "name": "AisTarget"
+        },
+        {
+          "name": "LargeTime"
+        },
+        {
+          "name": "Zoom"
+        }
+      ],
+      "bottomLeft": [
+        {
+          "caption": "DPT",
+          "unit": "m",
+          "formatterParameters": [
+            2,
+            1,
+            false
+          ],
+          "name": "DepthDisplay"
+        },
+        {
+          "name": "BRG"
+        },
+        {
+          "name": "DST"
+        }
+      ],
+      "bottomRight": [
+        {
+          "name": "COG"
+        },
+        {
+          "name": "SOG"
+        },
+        {
+          "name": "Position"
+        },
+        {
+          "name": "TimeStatus"
+        }
+      ],
+      "bottomLeft_anchor": [
+        {
+          "name": "AnchorBearing",
+          "caption": "ACHR-BRG",
+          "unit": "°"
+        },
+        {
+          "name": "AnchorDistance",
+          "caption": "ACHR-DST",
+          "unit": "m",
+          "formatterParameters": [
+            "m"
+          ]
+        },
+        {
+          "name": "AnchorWatchDistance",
+          "caption": "ACHR-WATCH",
+          "unit": "m",
+          "formatterParameters": [
+            3,
+            1
+          ]
+        }
+      ]
+    },
+    "editroutepage": {
+      "left": [
+        {
+          "name": "EditRoute"
+        },
+        {
+          "name": "RoutePoints"
+        }
+      ],
+      "left_small": [],
+      "top_small": [
+        {
+          "name": "EditRoute"
+        }
+      ],
+      "bottomLeft": [
+        {
+          "caption": "DPT",
+          "unit": "m",
+          "formatterParameters": [
+            3,
+            1,
+            true
+          ],
+          "name": "DepthDisplay"
+        },
+        {
+          "name": "BRG"
+        },
+        {
+          "name": "DST"
+        }
+      ],
+      "bottomRight": [
+        {
+          "name": "COG"
+        },
+        {
+          "name": "SOG"
+        },
+        {
+          "name": "TimeStatus"
+        },
+        {
+          "name": "Position"
+        }
+      ]
+    }
+  }
+}

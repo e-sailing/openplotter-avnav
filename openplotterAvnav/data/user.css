@@ -1,0 +1,46 @@
+/*
+  css file to adapt the avnav look and feel to your needs
+  use your browsers development tools to find out about the css classes of every element in the UI
+*/
+/*
+Assuming you would like to have a different symbol on the cancel button on every page:
+1. upload the image you want toe the "images" tab (Download page), in this case the name is alternateCancel.svg
+2. uncomment the entry below and reload avnav
+*/
+/*
+button.Cancel span {
+    background-image: url(/user/images/alternateCancel.svg);
+}
+*/
+
+.mapPage.mapFloat .button {
+	background-color: #e6e6e630;
+	border-style: solid;
+	border-width: 2px;
+	border-color: black;
+}
+.pageFrame.nightMode .mapPage.mapFloat .button {
+	background-color: #e6e6e650;
+}
+.mapPage.mapFloat .leftSection .widget {
+	background-color: #e6e6e630;
+	border-style: solid;
+	border-width: 2px;
+	border-color: black;
+}
+.mapPage.mapFloat .widgetContainer.left {
+	background-color: #e6e6e600;
+	border-style: solid;
+	border-width: 0px;
+	border-color: black;
+}
+.mapPage.mapFloat .widgetContainer.horizontal .widget {
+	background-color: #e6e6e630;
+	border-style: solid;
+	border-width: 2px;
+	border-color: black;
+}
+.mapPage.mapFloat .widgetContainer {
+	background-color: #e6e6e600;
+	border-width: 0px;
+}
