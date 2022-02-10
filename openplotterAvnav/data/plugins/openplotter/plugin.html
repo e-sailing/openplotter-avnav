@@ -1,0 +1,74 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <link rel="manifest" href="manifest.json">
+    <title>Document</title>
+</head>
+<body>
+    <h1> openplotter quick settings for avnav</h1>
+    <p>!!! This will overwrite your custom avnav local browser settings !!!  
+        <input type="checkbox" id="confirm" name="confirm"> confirm <br> <br>
+    </p>
+    <button onclick="fSetFullHd()">Settings for PC Browser</button>
+    <button onclick="fSet10Inch()">Settings for tablet</button>
+    <button onclick="fSet6Inch()">Settings for mobile</button>
+    <p><br><br>avnav default</p>
+    <button onclick="fSetAvnav()">avnav default</button>
+    <button onclick="fResetAvnav()">delete avnav browser storage</button>
+    <p><br><br><br>* this page is not based on a designed interface and will probably not work in the future! <br> 
+    It enables quick presetting of the settings parameters.<br>
+    All settings made can be set reliably via the settings page. It concerns:<br>
+    - Settings->Widgets->Widget Base Font(px)->14 | 12 | 10<br>
+    - Settings->Widgets->2 widget rows->uncheck<br>
+    - Settings->Buttons->Button Size(px)->50 | 42 | 35<br>
+    - Settings->Buttons->2 button columns->checked<br>
+    - Settings->Layout->Layout name->system.plugin.system-openplotter.default | system.defaults<br>
+    - Settings->Layout->Base Font(px)->14 | 12 | 10<br>
+    - Settings->Map->float map behind buttons->checked<br>
+    </p>
+
+    <script>
+    function fSetLocalstorage(jsonName,jsonString) {
+        if (document.querySelector('input[id="confirm"]').checked){
+            if(window.localStorage){
+            window.localStorage.setItem(jsonName,jsonString);
+            parent.location.reload(true);
+            }
+        }else{
+            alert("not confirmed")
+        }
+    }
+    
+    function fResetAvnav() {
+        if (document.querySelector('input[id="confirm"]').checked){
+            if(window.localStorage){
+                window.localStorage.clear();
+                parent.location.reload(true);
+            }
+        }else{
+            alert("not confirmed")
+        }
+    }
+
+    function fSetAvnav() {
+        fSetLocalstorage("avnav.settings", '{"layoutName":"system.default","cancelTop":true,"style":{"useHdpi":true}}');
+    }
+
+    function fSetFullHd() {
+        fSetLocalstorage("avnav.settings", '{"allowTwoWidgetRows":false,"layoutName":"system.plugin.system-openplotter.op","buttonCols":true,"cancelTop":true,"mapFloat":true,"style":{"useHdpi":true}}');
+    }
+
+    function fSet10Inch() {
+        fSetLocalstorage("avnav.settings", '{"aisTextSize":"12","baseFontSize":"12","widgetFontSize":"12","allowTwoWidgetRows":false,"layoutName":"system.plugin.system-openplotter.op","buttonCols":true,"cancelTop":true,"mapFloat":true,"style":{"buttonSize":"42"}}');
+    }
+
+    function fSet6Inch() {
+        fSetLocalstorage("avnav.settings", '{"aisTextSize":"10","baseFontSize":"10","widgetFontSize":"9","allowTwoWidgetRows":false,"layoutName":"system.plugin.system-openplotter.op","buttonCols":true,"cancelTop":true,"mapFloat":true,"style":{"buttonSize":"35"}}');
+    }
+    </script>
+
+</body>
+</html>

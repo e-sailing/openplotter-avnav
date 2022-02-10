@@ -104,6 +104,5 @@
 
 </Workers>
 <AVNUserAppHandler><UserTool icon="/user/images/kip.png" url="http://$HOST:3000/@mxtommy/kip/#/page/0" newWindow="false" keepUrl="True" name="2e2771f5a0007cfacfe9f765d65e19b0" title="KIP dashboard"/>
-<UserTool icon="/user/images/openplotter-48.png" title="openplotter browser settings" url="http://$HOST:8080/plugins/openplotter" newWindow="false" keepUrl="True" name="5a8e144b5cc5449afdc264c96b487aff"/>
 </AVNUserAppHandler>
 </AVNServer>

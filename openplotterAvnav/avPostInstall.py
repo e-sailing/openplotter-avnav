@@ -16,7 +16,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Openplotter. If not, see <http://www.gnu.org/licenses/>.
 
-import os, sys, subprocess, time
+import os, sys, subprocess, time, shutil
 from openplotterSettings import conf
 from openplotterSettings import language
 from openplotterSettings import platform
@@ -116,13 +116,15 @@ def main():
 	try:
 		subprocess.call(['apt', '-y', 'install', 'avnav-ocharts'])
 	except Exception as e: print(_('FAILED: ')+str(e))
+	print(_('DONE'))
 
 	try:
-		subprocess.call(['mv', '/usr/lib/avnav/viewer/layout/default.json', '/usr/lib/avnav/viewer/layout/original_default.json'])
-		subprocess.call(['cp', '-av', '/usr/lib/python3/dist-packages/openplotterAvnav/data/openplotter.json', '/usr/lib/avnav/viewer/layout'])
-		subprocess.call(['cp', '-av', '/usr/lib/python3/dist-packages/openplotterAvnav/data/openplotter.json', '/usr/lib/avnav/viewer/layout/default.json'])
-
-		print(_('DONE'))
+		if not os.path.isdir('/usr/lib/avnav/plugins/openplotter'):
+			print(_('Install openplotter plugin...'))
+			src = '/usr/lib/python3/dist-packages/openplotterAvnav/data/plugins/openplotter'
+			dest = '/usr/lib/avnav/plugins/openplotter'
+			shutil.copytree(src, dest)
+			print(_('DONE'))
 	except Exception as e: print(_('FAILED: ')+str(e))
 		
 	try:
@@ -145,22 +147,28 @@ def main():
 		fo.write(data)
 		fo.close()
 		
-		subprocess.call(['cp', '-av', '/usr/lib/python3/dist-packages/openplotterAvnav/data/signalk.service', '/etc/systemd/system'])
+		src = '/usr/lib/python3/dist-packages/openplotterAvnav/data/signalk.service'
+		dest = '/etc/systemd/system/signalk.service'
+		shutil.copy(src, dest)
+		print(_('DONE'))
+
 	except Exception as e: print(_('FAILED: ')+str(e))
 
 	try:
-		print(_('Setup avnav directory...'))
+		print(_('Start daemon-reload...'))
 		subprocess.call(['systemctl', 'daemon-reload'])
+		print(_('DONE'))
 	except Exception as e: print(_('FAILED: ')+str(e))
 	try:
+		print(_('Start enable avnav autostart...'))
 		subprocess.call(['systemctl', 'enable', 'avnav'])
+		print(_('DONE'))
 	except Exception as e: print(_('FAILED: ')+str(e))
 	try:
+		print(_('Start avnav restart...'))
 		subprocess.call(['systemctl', 'restart', 'avnav'])
+		print(_('DONE'))
 	except Exception as e: print(_('FAILED: ')+str(e))
-	#try:
-	#	subprocess.call(['cp', '-avr', '/usr/lib/python3/dist-packages/openplotterAvnav/data/avnav-avahi.service', '/etc/avahi/services'])
-	#except: pass
 	try:
 		print(_('Setup avnav ports...'))
 		#default to port 8080 if you use pypilot you should change this port
@@ -194,26 +202,27 @@ def main():
 		output = subprocess.check_output(['grep','-F','Exec=','/usr/share/applications/avnav.desktop']).decode("utf-8")
 		subprocess.call(platform2.admin + ' sed -i "s#'+output[0:-1]+'#Exec=x-www-browser http://localhost:'+str(AVNport)+'#g" /usr/share/applications/avnav.desktop', shell=True)
 		
-		subprocess.call(['systemctl', 'daemon-reload'])
-		subprocess.call(['systemctl', 'restart', 'avnav'])
+		#subprocess.call(['systemctl', 'daemon-reload'])
+		#subprocess.call(['systemctl', 'restart', 'avnav'])
+		print(_('DONE'))
+		
 	except Exception as e: print(_('FAILED: ')+str(e))
 	try:
 		if not cssExists:
 			while not os.path.exists(cssFile):
 				time.sleep(0.1)
-
-			subprocess.call(['cp', '/usr/lib/python3/dist-packages/openplotterAvnav/data/user.css', cssFile])
+			print(_('Copy avnav user.css...'))
+			src = '/usr/lib/python3/dist-packages/openplotterAvnav/data/user.css'
+			shutil.copyfile(src, cssFile)
+			print(_('DONE'))
 	except Exception as e: print(_('FAILED: ')+str(e))
 
 	try:
-		subprocess.call(['cp', '/usr/lib/python3/dist-packages/openplotterAvnav/data/kip.png', conf2.home +'/avnav/data/user/images'])
-		subprocess.call(['cp', '/usr/lib/python3/dist-packages/openplotterAvnav/data/openplotter-48.png', conf2.home +'/avnav/data/user/images'])
-	except Exception as e: print(_('FAILED: ')+str(e))
-
-	try:
-		subprocess.call(['cp', '/usr/lib/python3/dist-packages/openplotterAvnav/data/openplotter.json', '/usr/lib/avnav/viewer/layout'])
-		subprocess.call(['mkdir', '-p', '/usr/lib/avnav/server/plugins/openplotter'])
-		subprocess.call(['cp', '/usr/lib/python3/dist-packages/openplotterAvnav/data/index.html', '/usr/lib/avnav/server/plugins/openplotter'])
+		print(_('Copy images...'))
+		src = '/usr/lib/python3/dist-packages/openplotterAvnav/data/kip.png'
+		dest = conf2.home +'/avnav/data/user/images/kip.png'
+		shutil.copyfile(src,dest) 
+		print(_('DONE'))
 	except Exception as e: print(_('FAILED: ')+str(e))
 
 	try:

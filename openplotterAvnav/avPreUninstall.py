@@ -16,7 +16,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Openplotter. If not, see <http://www.gnu.org/licenses/>.
 
-import os, subprocess
+import os, subprocess, shutil
 from openplotterSettings import conf
 from openplotterSettings import language
 from openplotterSignalkInstaller import editSettings
@@ -49,14 +49,10 @@ def main():
 
 	print(_('Removing avnav...'))
 	try:
-		if os.path.isfile('/usr/lib/avnav/viewer/layout/openplotter.json'):
-			os.remove('/usr/lib/avnav/viewer/layout/openplotter.json')
-			os.remove('/usr/lib/avnav/viewer/layout/original_default.json')
-	except Exception as e: print(_('FAILED: ')+str(e))
-	try:
-		if os.path.isfile('/usr/lib/avnav/server/plugins/openplotter/index.html'):
-			os.remove('/usr/lib/avnav/server/plugins/openplotter/index.html')
-			os.rmdir('/usr/lib/avnav/server/plugins/openplotter')
+		if os.path.isfile('/usr/lib/avnav/plugins/openplotter/openplotter.json'):
+			shutil.rmtree('/usr/lib/avnav/plugins/openplotter')
+		if os.path.exists('/usr/lib/avnav/raspberry'):
+			shutil.rmtree('/usr/lib/avnav/raspberry')	
 	except Exception as e: print(_('FAILED: ')+str(e))
 	try:
 		subprocess.call(['apt', '-y', 'autoremove', 'avnav'])

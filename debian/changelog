@@ -1,3 +1,9 @@
+openplotter-avnav (3.0.1-beta) bullseye; urgency=medium
+
+  * openplotter plugin
+
+ -- e-sailing <e.minus.sailing@gmail.com>  Tue, 09 Feb 2022 11:34:23 +0100
+
 openplotter-avnav (3.0.0-beta) bullseye; urgency=medium
 
   * new version for v3.x.x

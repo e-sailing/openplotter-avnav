@@ -121,7 +121,7 @@ class MyFrame(wx.Frame):
 		}
 		self.appsDict.append(app)
 		
-		self.OSENCport = 8082
+		self.OCHARTSport = 8082
 		self.AVNport = 8080
 		self.updatePort = 8085
 		self.xmlDocFile = self.conf.home +'/avnav/data/avnav_server.xml'
@@ -140,7 +140,7 @@ class MyFrame(wx.Frame):
 			if sys_ocharts!=None:
 				if 'port' in sys_ocharts.attrib:
 					try:
-						self.OSENCport = int(sys_ocharts.attrib['port'] or 8082)
+						self.OCHARTSport = int(sys_ocharts.attrib['port'] or 8082)
 					except: pass
 			output = subprocess.check_output(['grep','-F','Environment=PORT=','/etc/systemd/system/avnavupdater.service.d/override.conf']).decode("utf-8").split('=')
 			if len(output) == 3:
@@ -201,7 +201,7 @@ class MyFrame(wx.Frame):
 		dlg = wx.MessageDialog(None, msg, _('Question'), wx.YES_NO | wx.NO_DEFAULT | wx.ICON_EXCLAMATION)
 		if dlg.ShowModal() == wx.ID_YES:
 			self.AVNport = str(self.port.GetValue())
-			self.OSENCport = str(self.port_osenc.GetValue())
+			self.OCHARTSport = str(self.port_ocharts.GetValue())
 			self.updatePort = str(self.port_update.GetValue())
 
 			self.xmlDoc.find('.//AVNHttpServer').attrib['httpPort'] = self.AVNport
@@ -215,7 +215,7 @@ class MyFrame(wx.Frame):
 				a.append(b)
 				
 			b = a.find('.//system-ocharts')
-			b.attrib['port'] = self.OSENCport
+			b.attrib['port'] = self.OCHARTSport
 
 			self.ShowStatusBarYELLOW(_('Configuring AVNAV port, please wait... '))
 
@@ -251,9 +251,9 @@ class MyFrame(wx.Frame):
 		portText2 = wx.StaticText(self.settings, label=_('Port 80 does not require ":8080" in browsers and app interfaces'))
 
 		portLabel2 = wx.StaticText(self.settings, label=_('Port'))
-		self.port_osenc = wx.SpinCtrl(self.settings, 101, min=80, max=65536, initial=self.OSENCport)
-		self.port_osenc.Bind(wx.EVT_SPINCTRL, self.onPort_osenc)
-		portText3 = wx.StaticText(self.settings, label=_('The AVNAV osenc plugin default port is 8082'))
+		self.port_ocharts = wx.SpinCtrl(self.settings, 101, min=80, max=65536, initial=self.OCHARTSport)
+		self.port_ocharts.Bind(wx.EVT_SPINCTRL, self.onPort_ocharts)
+		portText3 = wx.StaticText(self.settings, label=_('The AVNAV ocharts plugin default port is 8082'))
 
 		portLabel3 = wx.StaticText(self.settings, label=_('Port'))
 		self.port_update = wx.SpinCtrl(self.settings, 101, min=80, max=65536, initial=self.updatePort)
@@ -266,7 +266,7 @@ class MyFrame(wx.Frame):
 
 		hbox2 = wx.BoxSizer(wx.HORIZONTAL)
 		hbox2.Add(portLabel2, 0, wx.UP | wx.EXPAND, 5)
-		hbox2.Add(self.port_osenc, 0, wx.LEFT | wx.EXPAND, 10)
+		hbox2.Add(self.port_ocharts, 0, wx.LEFT | wx.EXPAND, 10)
 
 		hbox3 = wx.BoxSizer(wx.HORIZONTAL)
 		hbox3.Add(portLabel3, 0, wx.UP | wx.EXPAND, 5)
@@ -312,7 +312,7 @@ class MyFrame(wx.Frame):
 		self.toolbar1.EnableTool(105,True)
 		self.toolbar1.EnableTool(106,True)
 
-	def onPort_osenc(self, e):
+	def onPort_ocharts(self, e):
 		self.toolbar1.EnableTool(105,True)
 		self.toolbar1.EnableTool(106,True)
 
