@@ -25,11 +25,11 @@ class Plugin:
 		pass
 
 	def run(self):
-		self.api.registerLayout("op", "openplotter.json")
-		self.api.registerSettingsFile("op6","op_mobile.json")
-		self.api.registerSettingsFile("op6T","op_mobile_transp.json")
-		self.api.registerSettingsFile("op10T","op_tablet_transp.json")
-		self.api.registerSettingsFile("op20T","op_pcmonitor_transp.json")
+		self.api.registerLayout("full", "openplotter.json")
+		self.api.registerSettingsFile("mobile display","op_mobile.json")
+		self.api.registerSettingsFile("mobile display transparent","op_mobile_transp.json")
+		self.api.registerSettingsFile("tablet display transparent","op_tablet_transp.json")
+		self.api.registerSettingsFile("big monitor transparent","op_pcmonitor_transp.json")
 
 		self.api.log("started")
 		self.api.setStatus('NMEA','running')

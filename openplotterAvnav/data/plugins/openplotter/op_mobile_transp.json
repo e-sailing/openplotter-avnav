@@ -10,6 +10,6 @@
     "mapFloat": true,
     "style.buttonSize": 35,
     "style.useHdpi": true,
-    "layoutName": "plugin.system-openplotter.op"
+    "layoutName": "plugin.system-openplotter.full"
   }
 }

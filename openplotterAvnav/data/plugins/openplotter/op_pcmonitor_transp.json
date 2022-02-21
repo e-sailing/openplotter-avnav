@@ -6,6 +6,6 @@
     "cancelTop": true,
     "mapFloat": true,
     "style.useHdpi": true,
-    "layoutName": "plugin.system-openplotter.op"
+    "layoutName": "plugin.system-openplotter.full"
   }
 }
