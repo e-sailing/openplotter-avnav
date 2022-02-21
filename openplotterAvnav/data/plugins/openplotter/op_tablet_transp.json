@@ -1,0 +1,15 @@
+{
+  "settingsVersion": 1,
+  "properties": {
+    "aisTextSize": 12,
+    "baseFontSize": 12,
+    "widgetFontSize": 12,
+    "allowTwoWidgetRows": false,
+    "buttonCols": true,
+    "cancelTop": true,
+    "mapFloat": true,
+    "style.buttonSize": 42,
+    "style.useHdpi": true,
+    "layoutName": "plugin.system-openplotter.op"
+  }
+}

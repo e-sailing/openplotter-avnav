@@ -238,14 +238,17 @@
     "navpage": {
       "left": [
         {
-          "name": "Zoom"
+          "name": "CenterDisplay"
         },
         {
-          "name": "CenterDisplay"
+          "name": "Zoom"
         },
         {
           "show360": false,
           "name": "WindGraphics"
+        },
+        {
+          "name": "DepthDisplay"
         },
         {
           "name": "AisTarget"
@@ -281,20 +284,16 @@
       ],
       "bottomLeft": [
         {
-          "caption": "DPT",
-          "unit": "m",
-          "formatterParameters": [
-            2,
-            1,
-            false
-          ],
-          "name": "DepthDisplay"
+          "name": "WpPosition"
         },
         {
-          "name": "BRG"
+          "name": "ETA"
         },
         {
           "name": "DST"
+        },
+        {
+          "name": "BRG"
         }
       ],
       "bottomRight": [
@@ -305,10 +304,10 @@
           "name": "SOG"
         },
         {
-          "name": "Position"
+          "name": "TimeStatus"
         },
         {
-          "name": "TimeStatus"
+          "name": "Position"
         }
       ],
       "bottomLeft_anchor": [
@@ -353,20 +352,16 @@
       ],
       "bottomLeft": [
         {
-          "caption": "DPT",
-          "unit": "m",
-          "formatterParameters": [
-            3,
-            1,
-            true
-          ],
-          "name": "DepthDisplay"
+          "name": "WpPosition"
         },
         {
-          "name": "BRG"
+          "name": "ETA"
         },
         {
           "name": "DST"
+        },
+        {
+          "name": "BRG"
         }
       ],
       "bottomRight": [

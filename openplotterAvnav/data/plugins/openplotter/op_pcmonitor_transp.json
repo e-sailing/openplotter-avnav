@@ -1,0 +1,11 @@
+{
+  "settingsVersion": 1,
+  "properties": {
+    "allowTwoWidgetRows": false,
+    "buttonCols": true,
+    "cancelTop": true,
+    "mapFloat": true,
+    "style.useHdpi": true,
+    "layoutName": "plugin.system-openplotter.op"
+  }
+}
