@@ -13,26 +13,21 @@ button.Cancel span {
 }
 */
 /* buttons right side */
-.plugin_system_openplotter_full #navpage .button, .user_full #navpage .button {
+.plugin_system_openplotter_full .mapPage.mapFloat .button, .user_full .mapPage.mapFloat .button {
 	background-color: #e6e6e630;
 	border-style: solid;
 	border-width: 2px;
 	border-color: black;
 }
-
-.pageFrame.nightMode .mapPage .plugin_system_openplotter_full .button, .pageFrame.nightMode .mapPage .user_full .button {
-	background-color: #e6e6e650;
-}
-
 /* left side */
-.plugin_system_openplotter_full .leftSection .widget ,.user_full .leftSection .widget {
+.plugin_system_openplotter_full .mapPage.mapFloat .leftSection .widget, .user_full .mapPage.mapFloat .leftSection .widget {
 	background-color: #e6e6e630;
 	border-style: solid;
 	border-width: 2px;
 	border-color: black;
 }
 
-.plugin_system_openplotter_full .widgetContainer.left,.user_full .widgetContainer.left {
+.plugin_system_openplotter_full .mapPage.mapFloat .widgetContainer.left, .user_full .mapPage.mapFloat .widgetContainer.left {
 	background-color: #e6e6e600;
 	border-style: solid;
 	border-width: 0px;
@@ -40,7 +35,7 @@ button.Cancel span {
 }
 
 /* bottom */
-.plugin_system_openplotter_full .widgetContainer.horizontal .widget,.user_full .widgetContainer.horizontal .widget {
+.plugin_system_openplotter_full .mapPage.mapFloat .widgetContainer.horizontal .widget, .user_full .mapPage.mapFloat .widgetContainer.horizontal .widget {
 	background-color: #e6e6e630;
 	border-style: solid;
 	border-width: 2px;
@@ -49,7 +44,7 @@ button.Cancel span {
 
 /* bottom nightmode */
 
-.plugin_system_openplotter_full .mapPage .bottomSection,.user_full .mapPage .bottomSection{
+.plugin_system_openplotter_full .mapPage.mapFloat .bottomSection, .user_full .mapPage.mapFloat .bottomSection{
 	background-color: #e6e6e600;
 }
 
