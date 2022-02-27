@@ -12,35 +12,53 @@ button.Cancel span {
     background-image: url(/user/images/alternateCancel.svg);
 }
 */
-
-.mapPage.mapFloat .button {
+/* buttons right side */
+.plugin_system_openplotter_full #navpage .button, .user_full #navpage .button {
 	background-color: #e6e6e630;
 	border-style: solid;
 	border-width: 2px;
 	border-color: black;
 }
-.pageFrame.nightMode .mapPage.mapFloat .button {
+
+.pageFrame.nightMode .mapPage .plugin_system_openplotter_full .button, .pageFrame.nightMode .mapPage .user_full .button {
 	background-color: #e6e6e650;
 }
-.mapPage.mapFloat .leftSection .widget {
+
+/* left side */
+.plugin_system_openplotter_full .leftSection .widget ,.user_full .leftSection .widget {
 	background-color: #e6e6e630;
 	border-style: solid;
 	border-width: 2px;
 	border-color: black;
 }
-.mapPage.mapFloat .widgetContainer.left {
+
+.plugin_system_openplotter_full .widgetContainer.left,.user_full .widgetContainer.left {
 	background-color: #e6e6e600;
 	border-style: solid;
 	border-width: 0px;
 	border-color: black;
 }
-.mapPage.mapFloat .widgetContainer.horizontal .widget {
+
+/* bottom */
+.plugin_system_openplotter_full .widgetContainer.horizontal .widget,.user_full .widgetContainer.horizontal .widget {
 	background-color: #e6e6e630;
 	border-style: solid;
 	border-width: 2px;
 	border-color: black;
 }
-.mapPage.mapFloat .widgetContainer {
+
+/* bottom nightmode */
+
+.plugin_system_openplotter_full .mapPage .bottomSection,.user_full .mapPage .bottomSection{
+	background-color: #e6e6e600;
+}
+
+.plugin_system_openplotter_full .listContainer.widgetContainer.horizontal,.user_full .listContainer.widgetContainer.horizontal{
+	background-color: #e6e6e600;
+}
+
+/* left + bottom */
+.plugin_system_openplotter_full .widgetContainer ,.user_full .widgetContainer {
 	background-color: #e6e6e600;
 	border-width: 0px;
 }

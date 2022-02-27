@@ -25,7 +25,7 @@ class Plugin:
 		pass
 
 	def run(self):
-		self.api.registerLayout("full", "openplotter.json")
+		self.api.registerLayout("full", "openplotter_full.json")
 		self.api.registerSettingsFile("mobile display","op_mobile.json")
 		self.api.registerSettingsFile("mobile display transparent","op_mobile_transp.json")
 		self.api.registerSettingsFile("tablet display transparent","op_tablet_transp.json")

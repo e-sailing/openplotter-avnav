@@ -98,9 +98,6 @@ def main():
 
 	print(_('Install app...'))
 
-	cssFile = conf2.home +'/avnav/data/user/viewer/user.css'
-	cssExists = os.path.exists(cssFile)
-
 	try:
 		subprocess.call(['apt', '-y', 'install', 'avnav'])
 	except Exception as e: print(_('FAILED: ')+str(e))
@@ -206,15 +203,6 @@ def main():
 		#subprocess.call(['systemctl', 'restart', 'avnav'])
 		print(_('DONE'))
 		
-	except Exception as e: print(_('FAILED: ')+str(e))
-	try:
-		if not cssExists:
-			while not os.path.exists(cssFile):
-				time.sleep(0.1)
-			print(_('Copy avnav user.css...'))
-			src = '/usr/lib/python3/dist-packages/openplotterAvnav/data/user.css'
-			shutil.copyfile(src, cssFile)
-			print(_('DONE'))
 	except Exception as e: print(_('FAILED: ')+str(e))
 
 	try:

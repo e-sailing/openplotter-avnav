@@ -103,6 +103,8 @@
 </AVNCommandHandler>
 
 </Workers>
-<AVNUserAppHandler><UserTool icon="/user/images/kip.png" url="http://$HOST:3000/@mxtommy/kip/#/page/0" newWindow="false" keepUrl="True" name="2e2771f5a0007cfacfe9f765d65e19b0" title="KIP dashboard"/>
+<AVNUserAppHandler>
+<!--<UserTool icon="/user/images/kip.png" url="http://$HOST:3000/@mxtommy/kip/#/page/0" newWindow="false" keepUrl="True" name="2e2771f5a0007cfacfe9f765d65e19b0" title="KIP dashboard"/>
+-->
 </AVNUserAppHandler>
 </AVNServer>
