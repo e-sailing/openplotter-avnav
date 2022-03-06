@@ -36,9 +36,10 @@ def addSKconnection(port,platform,id):
 						skSettings.removeConnection(i['id'])
 					elif port:
 						if i['pipeElements'][0]['options']['type'] == 'NMEA0183':
-							if i['pipeElements'][0]['options']['subOptions']['type'] == 'udp':
-								if i['pipeElements'][0]['options']['subOptions']['port'] == str(port):
-									ID = i['id']
+							if i['pipeElements'][0]['options']['subOptions']['type'] == 'tcp':
+								if i['pipeElements'][0]['options']['subOptions']['host'] == 'localhost':
+									if i['pipeElements'][0]['options']['subOptions']['port'] == str(port):
+										ID = i['id']
 				except Exception as e:
 					print(str(e))
 		if ID == id:
