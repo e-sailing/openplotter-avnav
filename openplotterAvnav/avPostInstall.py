@@ -53,23 +53,6 @@ def main():
 	language.Language(currentdir, package, currentLanguage)
 	platform2 = platform.Platform()
 
-	app = {
-	'name': 'Avnav',
-	'platform': 'both',
-	'package': package,
-	'preUninstall': platform2.admin+' avPreUninstall',
-	'uninstall': 'openplotter-avnav',
-	'sources': ['https://www.free-x.de/deb4op'],
-	'dev': 'no',
-	'entryPoint': 'openplotter-avnav',
-	'postInstall': platform2.admin+' avPostInstall',
-	'reboot': 'no',
-	'module': 'openplotterAvnav',
-	'conf': 'avnav'	
-	}
-	#gpgKey = currentdir+'/data/myapp.gpg.key' ### replace by the path to your gpg key file. Replace contents of this file by your key.
-	#sourceList = currentdir+'/data/myapp.list' ### replace by the path to your sources list file. Replace contents of this file by your packages sources.
-
 	print(_('Check for old app in OpenPlotter...'))
 	try:
 		externalApps1 = []
@@ -83,18 +66,6 @@ def main():
 		print(_('DONE'))
 	except Exception as e: print(_('FAILED: ')+str(e))
 
-	#print(_('Checking sources...'))
-	#try:
-	#	sources = subprocess.check_output('apt-cache policy', shell=True).decode(sys.stdin.encoding)
-	#	exists = True
-	#	for i in app['sources']:
-	#		if not i in sources: exists = False
-	#	if not exists:
-	#		os.system('cp '+sourceList+' /etc/apt/sources.list.d')
-	#		os.system('apt-key add - < '+gpgKey)
-	#		os.system('apt update')
-	#	print(_('DONE'))
-	#except Exception as e: print(_('FAILED: ')+str(e))
 
 	print(_('Install app...'))
 
