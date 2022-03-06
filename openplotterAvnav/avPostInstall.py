@@ -89,7 +89,7 @@ def main():
 	try:
 		if not os.path.isdir('/usr/lib/avnav/plugins/openplotter'):
 			print(_('Install openplotter plugin...'))
-			src = '/usr/lib/python3/dist-packages/openplotterAvnav/data/plugins/openplotter'
+			src = currentdir+'/data/plugins/openplotter'
 			dest = '/usr/lib/avnav/plugins/openplotter'
 			shutil.copytree(src, dest)
 			print(_('DONE'))
@@ -107,7 +107,7 @@ def main():
 		data+= '[Service]\n'
 		data+= 'User=pi\n'
 		data+= 'ExecStart=\n'
-		data+= 'ExecStart=/usr/bin/avnav -q -b ' + conf2.home + '/avnav/data -t /usr/lib/python3/dist-packages/openplotterAvnav/data/avnav_server.xml\n\n'
+		data+= 'ExecStart=/usr/bin/avnav -q -b ' + conf2.home + '/avnav/data -t '+currentdir+'/data/avnav_server.xml\n\n'
 		data+= '[Install]\n'
 		data+= 'WantedBy=multi-user.target\n'
 
@@ -115,7 +115,7 @@ def main():
 		fo.write(data)
 		fo.close()
 		
-		src = '/usr/lib/python3/dist-packages/openplotterAvnav/data/signalk.service'
+		src = currentdir+'/data/signalk.service'
 		dest = '/etc/systemd/system/signalk.service'
 		shutil.copy(src, dest)
 		print(_('DONE'))
@@ -178,7 +178,7 @@ def main():
 
 	try:
 		print(_('Copy images...'))
-		src = '/usr/lib/python3/dist-packages/openplotterAvnav/data/kip.png'
+		src = currentdir+'/data/kip.png'
 		dest = conf2.home +'/avnav/data/user/images/kip.png'
 		shutil.copyfile(src,dest) 
 		print(_('DONE'))
