@@ -183,7 +183,7 @@ class MyFrame(wx.Frame):
 		except:pass
 
 	def OnToolHelp(self, event): 
-		url = "/usr/lib/python3/dist-packages/openplotterAvnav/data/help.html"
+		url = "/usr/share/openplotter-doc/avnav/avnav_app.html"
 		webbrowser.open(url, new=2)
 
 	def OnToolSettings(self, event=0): 
