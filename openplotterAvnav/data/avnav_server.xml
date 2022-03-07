@@ -75,6 +75,9 @@
 <!-- ##CANBOAT 
 	<builtin-canboat enabled="true" allowKeyOverwrite="true" autoSendRMC="30" sourceName="canboatgen"/>
  ##CANBOAT -->
+<builtin-canboat enabled="False"/>
+<builtin-testPlugin enabled="False"/>
+<system-ocharts useOCPNCharts="True"/>
 </AVNPluginHandler>
 
 <!-- create chart overview files -->

@@ -1,3 +1,9 @@
+openplotter-avnav (3.0.4-beta) bullseye; urgency=medium
+
+  * use opencpn ocharts + fix
+
+ -- e-sailing <e.minus.sailing@gmail.com>  Mon, 07 Mar 2022 21:49:23 +0100
+
 openplotter-avnav (3.0.3-beta) bullseye; urgency=medium
 
   * integrate css in plugin
