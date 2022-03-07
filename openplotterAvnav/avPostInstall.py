@@ -36,9 +36,10 @@ def addSKconnection(port,platform,id):
 						skSettings.removeConnection(i['id'])
 					elif port:
 						if i['pipeElements'][0]['options']['type'] == 'NMEA0183':
-							if i['pipeElements'][0]['options']['subOptions']['type'] == 'udp':
-								if i['pipeElements'][0]['options']['subOptions']['port'] == str(port):
-									ID = i['id']
+							if i['pipeElements'][0]['options']['subOptions']['type'] == 'tcp':
+								if i['pipeElements'][0]['options']['subOptions']['host'] == 'localhost':
+									if i['pipeElements'][0]['options']['subOptions']['port'] == str(port):
+										ID = i['id']
 				except Exception as e:
 					print(str(e))
 		if ID == id:
@@ -53,23 +54,6 @@ def main():
 	language.Language(currentdir, package, currentLanguage)
 	platform2 = platform.Platform()
 
-	app = {
-	'name': 'Avnav',
-	'platform': 'both',
-	'package': package,
-	'preUninstall': platform2.admin+' avPreUninstall',
-	'uninstall': 'openplotter-avnav',
-	'sources': ['https://www.free-x.de/deb4op'],
-	'dev': 'no',
-	'entryPoint': 'openplotter-avnav',
-	'postInstall': platform2.admin+' avPostInstall',
-	'reboot': 'no',
-	'module': 'openplotterAvnav',
-	'conf': 'avnav'	
-	}
-	#gpgKey = currentdir+'/data/myapp.gpg.key' ### replace by the path to your gpg key file. Replace contents of this file by your key.
-	#sourceList = currentdir+'/data/myapp.list' ### replace by the path to your sources list file. Replace contents of this file by your packages sources.
-
 	print(_('Check for old app in OpenPlotter...'))
 	try:
 		externalApps1 = []
@@ -83,18 +67,6 @@ def main():
 		print(_('DONE'))
 	except Exception as e: print(_('FAILED: ')+str(e))
 
-	#print(_('Checking sources...'))
-	#try:
-	#	sources = subprocess.check_output('apt-cache policy', shell=True).decode(sys.stdin.encoding)
-	#	exists = True
-	#	for i in app['sources']:
-	#		if not i in sources: exists = False
-	#	if not exists:
-	#		os.system('cp '+sourceList+' /etc/apt/sources.list.d')
-	#		os.system('apt-key add - < '+gpgKey)
-	#		os.system('apt update')
-	#	print(_('DONE'))
-	#except Exception as e: print(_('FAILED: ')+str(e))
 
 	print(_('Install app...'))
 
@@ -118,7 +90,7 @@ def main():
 	try:
 		if not os.path.isdir('/usr/lib/avnav/plugins/openplotter'):
 			print(_('Install openplotter plugin...'))
-			src = '/usr/lib/python3/dist-packages/openplotterAvnav/data/plugins/openplotter'
+			src = currentdir+'/data/plugins/openplotter'
 			dest = '/usr/lib/avnav/plugins/openplotter'
 			shutil.copytree(src, dest)
 			print(_('DONE'))
@@ -136,7 +108,7 @@ def main():
 		data+= '[Service]\n'
 		data+= 'User=pi\n'
 		data+= 'ExecStart=\n'
-		data+= 'ExecStart=/usr/bin/avnav -q -b ' + conf2.home + '/avnav/data -t /usr/lib/python3/dist-packages/openplotterAvnav/data/avnav_server.xml\n\n'
+		data+= 'ExecStart=/usr/bin/avnav -q -b ' + conf2.home + '/avnav/data -t '+currentdir+'/data/avnav_server.xml\n\n'
 		data+= '[Install]\n'
 		data+= 'WantedBy=multi-user.target\n'
 
@@ -144,7 +116,7 @@ def main():
 		fo.write(data)
 		fo.close()
 		
-		src = '/usr/lib/python3/dist-packages/openplotterAvnav/data/signalk.service'
+		src = currentdir+'/data/signalk.service'
 		dest = '/etc/systemd/system/signalk.service'
 		shutil.copy(src, dest)
 		print(_('DONE'))
@@ -207,7 +179,7 @@ def main():
 
 	try:
 		print(_('Copy images...'))
-		src = '/usr/lib/python3/dist-packages/openplotterAvnav/data/kip.png'
+		src = currentdir+'/data/kip.png'
 		dest = conf2.home +'/avnav/data/user/images/kip.png'
 		shutil.copyfile(src,dest) 
 		print(_('DONE'))
