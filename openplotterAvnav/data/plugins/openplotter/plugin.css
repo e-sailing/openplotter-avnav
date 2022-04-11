@@ -1,24 +1,19 @@
 /*
-  css file to adapt the avnav look and feel to your needs
-  use your browsers development tools to find out about the css classes of every element in the UI
-*/
-/*
-Assuming you would like to have a different symbol on the cancel button on every page:
-1. upload the image you want toe the "images" tab (Download page), in this case the name is alternateCancel.svg
-2. uncomment the entry below and reload avnav
-*/
-/*
-button.Cancel span {
-    background-image: url(/user/images/alternateCancel.svg);
-}
+  css file to adapt the avnav look and feel to openplotter
 */
 /* buttons right side */
 .plugin_system_openplotter_full .mapPage.mapFloat .button, .user_full .mapPage.mapFloat .button {
 	background-color: #e6e6e630;
-	border-style: solid;
-	border-width: 2px;
 	border-color: black;
 }
+.plugin_system_openplotter_full .mapPage.mapFloat .button.active, .user_full .mapPage.mapFloat .button.active {
+	border-color: #1DE9B6;
+	border-width: 3px;
+}
+.plugin_system_openplotter_full .mapPage.mapFloat .button.active.MOB, .user_full .mapPage.mapFloat .button.active.MOB {
+	border-color: #c62828;
+}
+
 /* left side */
 .plugin_system_openplotter_full .mapPage.mapFloat .leftSection .widget, .user_full .mapPage.mapFloat .leftSection .widget {
 	background-color: #e6e6e630;

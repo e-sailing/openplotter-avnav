@@ -88,12 +88,13 @@ def main():
 	print(_('DONE'))
 
 	try:
-		if not os.path.isdir('/usr/lib/avnav/plugins/openplotter'):
-			print(_('Install openplotter plugin...'))
-			src = currentdir+'/data/plugins/openplotter'
-			dest = '/usr/lib/avnav/plugins/openplotter'
-			shutil.copytree(src, dest)
-			print(_('DONE'))
+		if os.path.isdir('/usr/lib/avnav/plugins/openplotter'):
+			shutil.rmtree('/usr/lib/avnav/plugins/openplotter')	
+		print(_('Install openplotter plugin...'))
+		src = currentdir+'/data/plugins/openplotter'
+		dest = '/usr/lib/avnav/plugins/openplotter'
+		shutil.copytree(src, dest)
+		print(_('DONE'))
 	except Exception as e: print(_('FAILED: ')+str(e))
 		
 	try:
@@ -181,6 +182,7 @@ def main():
 		print(_('Copy images...'))
 		src = currentdir+'/data/kip.png'
 		dest = conf2.home +'/avnav/data/user/images/kip.png'
+		os.makedirs(os.path.dirname(conf2.home +'/avnav/data/user/images'), exist_ok=True)
 		shutil.copyfile(src,dest) 
 		print(_('DONE'))
 	except Exception as e: print(_('FAILED: ')+str(e))

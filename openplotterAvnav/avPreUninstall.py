@@ -49,9 +49,9 @@ def main():
 
 	print(_('Removing avnav...'))
 	try:
-		if os.path.isfile('/usr/lib/avnav/plugins/openplotter/openplotter.json'):
+		if os.path.isdir('/usr/lib/avnav/plugins/openplotter'):
 			shutil.rmtree('/usr/lib/avnav/plugins/openplotter')
-		if os.path.exists('/usr/lib/avnav/raspberry'):
+		if os.path.isdir('/usr/lib/avnav/raspberry'):
 			shutil.rmtree('/usr/lib/avnav/raspberry')	
 	except Exception as e: print(_('FAILED: ')+str(e))
 	try:
