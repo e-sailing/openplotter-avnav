@@ -1,3 +1,10 @@
+openplotter-avnav (3.0.6-beta) bullseye; urgency=medium
+
+  * fix no change to signalk.service
+  * fix directory settings when using other user than pi
+
+ -- e-sailing <e.minus.sailing@gmail.com>  Fri, 24 May 2022 21:57:58 +0100
+
 openplotter-avnav (3.0.5-beta) bullseye; urgency=medium
 
   * add signak settings

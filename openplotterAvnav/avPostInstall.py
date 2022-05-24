@@ -21,8 +21,6 @@ from openplotterSettings import conf
 from openplotterSettings import language
 from openplotterSettings import platform
 from .version import version
-import lxml.etree as et
-
 
 def addSKconnection(port,platform,id):
 	if platform.skDir:
@@ -103,23 +101,15 @@ def main():
 		if not os.path.isdir('/usr/lib/systemd/system/avnav.service.d'):
 			os.makedirs('/usr/lib/systemd/system/avnav.service.d')
 		
-		data = '[Unit]\n'
-		data+= 'Description=Browser based navigation (chart plotter)\n'
-		data+= 'After=syslog.target network.target\n\n'
-		data+= '[Service]\n'
-		data+= 'User=pi\n'
+		data= '[Service]\n'
+		data+= 'User='+conf2.home.split('/')[2]+'\n'
 		data+= 'ExecStart=\n'
 		data+= 'ExecStart=/usr/bin/avnav -q -b ' + conf2.home + '/avnav/data -t '+currentdir+'/data/avnav_server.xml\n\n'
-		data+= '[Install]\n'
-		data+= 'WantedBy=multi-user.target\n'
 
 		fo = open('/usr/lib/systemd/system/avnav.service.d/avnav.conf', "w")
 		fo.write(data)
 		fo.close()
 		
-		src = currentdir+'/data/signalk.service'
-		dest = '/etc/systemd/system/signalk.service'
-		shutil.copy(src, dest)
 		print(_('DONE'))
 
 	except Exception as e: print(_('FAILED: ')+str(e))
@@ -139,23 +129,9 @@ def main():
 		subprocess.call(['systemctl', 'restart', 'avnav'])
 		print(_('DONE'))
 	except Exception as e: print(_('FAILED: ')+str(e))
+
 	try:
-		print(_('Setup avnav ports...'))
-		#default to port 8080 if you use pypilot you should change this port
-		AVNport = 8080
-		xmlDocFile = conf2.home +'/avnav/data/avnav_server.xml'
-		xmlload = False
-		if os.path.exists(xmlDocFile):
-			xmlDoc = et.ElementTree(file=xmlDocFile)
-			xmlload = True
-
-			AVNHttpS = xmlDoc.find('.//AVNHttpServer')
-			if AVNHttpS!=None:
-				if 'httpPort' in AVNHttpS.attrib:
-					try:
-						AVNport = int(AVNHttpS.attrib['httpPort'] or 8080)
-					except: pass
-
+		print(_('Setup sound...'))
 		soundSh= '/usr/lib/avnav/raspberry/sound.sh'
 		raspberryDir = os.path.dirname(soundSh)
 		if not os.path.exists(soundSh):
@@ -165,7 +141,8 @@ def main():
 				os.symlink(os.path.abspath(os.path.join(os.path.dirname(__file__), 'data','sound.sh')),soundSh)
 			except:
 				pass
-		
+
+		AVNport = 8080		
 		#change avahi
 		#subprocess.call(platform2.admin + ' python3 '+currentdir+'/changeAvahiPort.py ' + str(AVNport), shell=True)
 		#change menu
@@ -176,15 +153,6 @@ def main():
 		#subprocess.call(['systemctl', 'restart', 'avnav'])
 		print(_('DONE'))
 		
-	except Exception as e: print(_('FAILED: ')+str(e))
-
-	try:
-		print(_('Copy images...'))
-		src = currentdir+'/data/kip.png'
-		dest = conf2.home +'/avnav/data/user/images/kip.png'
-		os.makedirs(os.path.dirname(conf2.home +'/avnav/data/user/images'), exist_ok=True)
-		shutil.copyfile(src,dest) 
-		print(_('DONE'))
 	except Exception as e: print(_('FAILED: ')+str(e))
 
 	try:

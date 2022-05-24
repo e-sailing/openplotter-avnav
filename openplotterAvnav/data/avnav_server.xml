@@ -8,29 +8,10 @@
      systimediff: timediff in seconds between gps timestamp and system time that we allow before we set gps time
      settimeperiod: time in seconds befor we retry setting the systemtime
 -->
-<AVNConfig debug="0" debugToLog="true" expiryTime="3000.0" logfile="/home/pi/avnav/data/log/avnav.log" maxtimeback="5" settimecmd="" settimeperiod="3600" systimediff="5"/>
 <!-- the workers section -->
 <Workers>
-<AVNGpsdFeeder gpsdcommand="/usr/sbin/gpsd -b -n -N -G" listenerPort="4020" port="2948" useGpsd="false"/>
-<!-- the universal feeder 
-     the gpsd is only here for compatibility with old set ups
-     if you still enable it here, a couple of features will not work
-     as dpsd lacks some decoders we need
-     so leave this entry untouched
-     -->
 
-
-<!-- the Web server
-     the port defaults to 8080, the host to "any"
-     set the translation between URLs and real pathes as you need
-     the navurl is the url that is used to control any nav feature
-     this of course must fit to the java script part...
--->
 <AVNHttpServer httpPort="8080" index="/viewer/avnav_viewer.html" navurl="/viewer/avnav_navi.php">
-    <Directory path="/home/pi/avnav/data/charts" urlpath="maps"/>
-    <Directory path="/home/pi/avnav/data/log" urlpath="log"/>
-    <Directory path="/home/pi/avnav/data/tracks" urlpath="tracks"/>
-    <Directory path="/home/pi/avnav/data/routes" urlpath="routes"/>
     <MimeType extension=".avt" type="text/plain"/>
     <MimeType extension=".log" type="text/plain"/>
 </AVNHttpServer>
@@ -42,7 +23,7 @@
      interval is the minimum interval between writing trackpoints
      mindistance is the minimum distance in m before a new trackpoint is written (interval wins)
       -->
-<AVNTrackWriter interval="10" mindistance="50" trackdir="/home/pi/avnav/data/tracks"/>
+<AVNTrackWriter interval="10" mindistance="50"/>
 <!-- an TCP writer that will provide data from the feeder input to other systems
      port - the listener port
      filter can be either $XXX,... - the NMEA setence, in this case the first 2 characters are ignored or
@@ -54,46 +35,9 @@
  -->
 <!-- a tcp socket that will output all NMEA data that AvNav has received
      you can customize it using the filter -->
-<AVNSocketWriter blackList="signalk" enabled="False" filter="" maxDevices="5" minTime="50" name="tosignalk" port="28628" read="true"/>
-<!-- the following entries provide the integration with signalk and canboat
-     we provide a connector to canboat (n2kd) to receive all data that has been translated from nmea2000 to nmea0183
-     we provide an additional socket that will provide only the nmea data that has not been received from canboat
-       this will be used for signalk to get all of our nmea0183. signalk will itself connect to canboat to get the nmea2000
-       directly, inside signalk just configure a connector to this port and the canboat nmea200 connector
-     we additional have 2 plugins:
-       * signalk: will receive all data at vessels/self from signalk and store it at gps.signalk in our store
-       * canboat: will receive pgns that are not translated to NMEA0183 - currently only 126992 to get the time
-     for canboat to work you potentially need to modify /etc/default/n2kd and /boot/config.txt
--->
-<!-- ##SIGNALK CANBOAT
-<AVNSocketWriter port="34568" maxDevices="5" filter="" read="true" minTime="50" name="nmea0183tosignalk" blackList="canboatnmea0183,canboatgen"/>
-<AVNSocketReader port="2599" host="localhost" filter="" name="canboatnmea0183"/>
- ##SIGNALK CANBOAT-->
-<AVNSocketReader enabled="False" filter="^$RMB" host="localhost" name="signalk" port="10110"/>
+<AVNSocketWriter blackList="signalk" enabled="true" filter="$RMB,$APB" maxDevices="5" minTime="50" name="tosignalk" port="28628" read="true"/>
+<AVNSocketReader enabled="False" filter="^$RMB,^$APB" host="localhost" name="signalk" port="10110"/>
 <AVNPluginHandler>
-        <builtin-signalk enabled="true" migrated="True"/>
-<!-- ##CANBOAT 
-     <builtin-canboat enabled="true" allowKeyOverwrite="true" autoSendRMC="30" sourceName="canboatgen"/>
- ##CANBOAT -->
-<!-- ##oCharts 
-    name:'enabled' set to true to enable plugin default:true
-    name:'port' the listener port for the chart provider executable default:'8082'
-    name:'internalPlugin', 'description': 'use the plugin installed below our own root dir  default:'true'
-    name:'configdir'  directory for cfg files', default': '$DATADIR/ocharts'
-    name:'ocpnPluginDir','description':'directory for OpenCPN plugins default:'' param:
-    name:'exeDir', 'description': 'directory oeserverd  default: '' param:e
-    name:'s57DataDir', 'description': 'parent directory for s57data  default:''
-    name:'threads' number of provider threads  default:"5" param:t
-    name:'debug' debuglevel for provider  default:'1' param:d
-    name:'chartdir' location for additional charts  default: ''
-    name:'uploadDir', 'description': 'location for chart upload  default: '' param:u
-    name:'scale' scale for provider  default:"2" param:s
-    name:'cacheSize' number of tiles in cache  default: '10000' param:c
-    name:'diskCacheSize', 'description': 'number of tiles in cache on disk per set  default: '400000' param:f
-    name:'prefillZoom', 'description': 'max zoom level for cache prefill  default: '17' param:r
-    name:'memPercent' percent of existing mem to be used  default:'' param:x-->
-        <system-ocharts enabled="true" memPercent="30" port="8082"/>
-<builtin-canboat enabled="False"/>
 </AVNPluginHandler>
 
 <!-- create chart overview files -->
@@ -103,7 +47,7 @@
       interval: interval in seconds for computing RMB data (default: 5)
       computeRMB: default True, set to false if you do not want RMB computation
 -->
-<AVNRouter routesdir="/home/pi/avnav/data/routes"/>
+<AVNRouter/>
 <!-- log nmea data
      will create .nmea(.gz) files in the tracks directory
      parameters:
@@ -112,7 +56,7 @@
      interval: minimal interval in seconds between sentences of the same type (default: 5)
 -->
 <AVNNmeaLogger/>
-<AVNImporter importDir="/home/pi/avnav/data/import"/>
+<AVNImporter/>
 <!-- add the following property to AVNWpaHandler to be able to allow external access for wlan client
      firewallCommand="sudo -n $BASEDIR/../raspberry/iptables-ext.sh wlan-av1"
 -->
@@ -122,6 +66,6 @@
 </AVNCommandHandler>
 
 </Workers>
-<AVNSignalKHandler decodeData="True" fetchAis="True" fetchCharts="False" migrated="True" receiveNotifications="True" sendData="True" userName="openplotter" uuid="cd15ce59-ff6a-4beb-8122-4964153ac7dd"/>
+<AVNSignalKHandler decodeData="True" fetchAis="True" fetchCharts="False" migrated="True" receiveNotifications="True" sendData="True"/>
 
 </AVNServer>
