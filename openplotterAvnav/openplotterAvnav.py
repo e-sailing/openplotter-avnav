@@ -68,8 +68,6 @@ class MyFrame(wx.Frame):
 		self.toolbar1.AddSeparator()
 		toolAvnav = self.toolbar1.AddTool(110, 'Avnav', wx.Bitmap(self.currentdir+"/data/sailboat24r.png"))
 		self.Bind(wx.EVT_TOOL, self.OnToolAvnav, toolAvnav)
-		toolAvnavSplit = self.toolbar1.AddTool(111, 'Avnav split', wx.Bitmap(self.currentdir+"/data/sailboath24rs.png"))
-		self.Bind(wx.EVT_TOOL, self.OnToolAvnavSplit, toolAvnavSplit)
 		self.toolbar1.AddSeparator()
 		toolApply = self.toolbar1.AddTool(105, _('Apply Changes'), wx.Bitmap(self.currentdir+"/data/apply.png"))
 		self.Bind(wx.EVT_TOOL, self.OnToolApply, toolApply)
@@ -192,10 +190,6 @@ class MyFrame(wx.Frame):
 
 	def OnToolAvnav(self, event):
 		url = "http://localhost:"+str(self.AVNport)
-		webbrowser.open(url, new=2)
-
-	def OnToolAvnavSplit(self, event):
-		url = "http://localhost:"+str(self.AVNport)+"/viewer/viewer_split.html"
 		webbrowser.open(url, new=2)
 
 	def OnToolApply(self,e):

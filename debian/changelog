@@ -1,3 +1,9 @@
+openplotter-avnav (3.0.7-stable) bullseye; urgency=medium
+
+  * remove button split screen (now integrated in avnav)
+
+ -- e-sailing <e.minus.sailing@gmail.com>  Fri, 13 Jan 2023 12:48:57 +0200
+
 openplotter-avnav (3.0.6-beta) bullseye; urgency=medium
 
   * fix no change to signalk.service
