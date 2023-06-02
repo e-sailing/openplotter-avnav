@@ -1,3 +1,9 @@
+openplotter-avnav (3.0.8-stable) bullseye; urgency=medium
+
+  * try to install o-charts only on supported architectures
+
+ -- e-sailing <e.minus.sailing@gmail.com>  Fri, 02 Jun 2023 12:48:57 +0200
+
 openplotter-avnav (3.0.7-stable) bullseye; urgency=medium
 
   * remove button split screen (now integrated in avnav)
