@@ -77,12 +77,14 @@ def main():
 	try:
 		subprocess.call(['apt', '-y', 'install', 'avnav-mapproxy-plugin'])
 	except Exception as e: print(_('FAILED: ')+str(e))
-	try:
-		subprocess.call(['apt', '-y', 'install', 'avnav-ocharts-plugin'])
-	except Exception as e: print(_('FAILED: ')+str(e))
-	try:
-		subprocess.call(['apt', '-y', 'install', 'avnav-ocharts'])
-	except Exception as e: print(_('FAILED: ')+str(e))
+	result = subprocess.run(['dpkg', '--print-architecture'],stdout=subprocess.PIPE)
+	if result.stdout.decode('utf-8').strip() in [ 'amd64', 'armhf', 'arm64']:
+		try:
+			subprocess.call(['apt', '-y', 'install', 'avnav-ocharts-plugin'])
+		except Exception as e: print(_('FAILED: ')+str(e))
+		try:
+			subprocess.call(['apt', '-y', 'install', 'avnav-ocharts'])
+		except Exception as e: print(_('FAILED: ')+str(e))
 	print(_('DONE'))
 
 	try:
