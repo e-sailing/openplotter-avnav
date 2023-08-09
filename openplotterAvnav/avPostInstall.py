@@ -104,6 +104,7 @@ def main():
 			os.makedirs('/usr/lib/systemd/system/avnav.service.d')
 		
 		data= '[Service]\n'
+                data+= 'PrivateTmp=yes\n'
 		data+= 'User='+conf2.home.split('/')[2]+'\n'
 		data+= 'ExecStart=\n'
 		data+= 'ExecStart=/usr/bin/avnav -q -b ' + conf2.home + '/avnav/data -t '+currentdir+'/data/avnav_server.xml\n'
