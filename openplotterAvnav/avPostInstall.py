@@ -41,7 +41,7 @@ def addSKconnection(port,platform,id):
 				except Exception as e:
 					print(str(e))
 		if ID == id:
-			if port: skSettings.setNetworkConnection(ID, 'NMEA0183', 'TCP', 'localhost', str(port))
+			if port: skSettings.setNetworkConnection(ID, 'NMEA0183', 'TCP', '127.0.0.1', str(port))
 
 
 def main():
@@ -104,7 +104,7 @@ def main():
 			os.makedirs('/usr/lib/systemd/system/avnav.service.d')
 		
 		data= '[Service]\n'
-                data+= 'PrivateTmp=yes\n'
+		data+= 'PrivateTmp=yes\n'
 		data+= 'User='+conf2.home.split('/')[2]+'\n'
 		data+= 'ExecStart=\n'
 		data+= 'ExecStart=/usr/bin/avnav -q -b ' + conf2.home + '/avnav/data -t '+currentdir+'/data/avnav_server.xml\n'
