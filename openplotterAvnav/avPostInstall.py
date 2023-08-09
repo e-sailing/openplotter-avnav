@@ -35,7 +35,7 @@ def addSKconnection(port,platform,id):
 					elif port:
 						if i['pipeElements'][0]['options']['type'] == 'NMEA0183':
 							if i['pipeElements'][0]['options']['subOptions']['type'] == 'tcp':
-								if i['pipeElements'][0]['options']['subOptions']['host'] == 'localhost':
+								if i['pipeElements'][0]['options']['subOptions']['host'] == '127.0.0.1':
 									if i['pipeElements'][0]['options']['subOptions']['port'] == str(port):
 										ID = i['id']
 				except Exception as e:
