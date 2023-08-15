@@ -35,13 +35,13 @@ def addSKconnection(port,platform,id):
 					elif port:
 						if i['pipeElements'][0]['options']['type'] == 'NMEA0183':
 							if i['pipeElements'][0]['options']['subOptions']['type'] == 'tcp':
-								if i['pipeElements'][0]['options']['subOptions']['host'] == 'localhost':
+								if i['pipeElements'][0]['options']['subOptions']['host'] == '127.0.0.1':
 									if i['pipeElements'][0]['options']['subOptions']['port'] == str(port):
 										ID = i['id']
 				except Exception as e:
 					print(str(e))
 		if ID == id:
-			if port: skSettings.setNetworkConnection(ID, 'NMEA0183', 'TCP', 'localhost', str(port))
+			if port: skSettings.setNetworkConnection(ID, 'NMEA0183', 'TCP', '127.0.0.1', str(port))
 
 
 def main():
@@ -77,12 +77,14 @@ def main():
 	try:
 		subprocess.call(['apt', '-y', 'install', 'avnav-mapproxy-plugin'])
 	except Exception as e: print(_('FAILED: ')+str(e))
-	try:
-		subprocess.call(['apt', '-y', 'install', 'avnav-ocharts-plugin'])
-	except Exception as e: print(_('FAILED: ')+str(e))
-	try:
-		subprocess.call(['apt', '-y', 'install', 'avnav-ocharts'])
-	except Exception as e: print(_('FAILED: ')+str(e))
+	result = subprocess.run(['dpkg', '--print-architecture'],stdout=subprocess.PIPE)
+	if result.stdout.decode('utf-8').strip() in [ 'amd64', 'armhf', 'arm64']:
+		try:
+			subprocess.call(['apt', '-y', 'install', 'avnav-ocharts-plugin'])
+		except Exception as e: print(_('FAILED: ')+str(e))
+		try:
+			subprocess.call(['apt', '-y', 'install', 'avnav-ocharts'])
+		except Exception as e: print(_('FAILED: ')+str(e))
 	print(_('DONE'))
 
 	try:
@@ -102,6 +104,7 @@ def main():
 			os.makedirs('/usr/lib/systemd/system/avnav.service.d')
 		
 		data= '[Service]\n'
+		data+= 'PrivateTmp=yes\n'
 		data+= 'User='+conf2.home.split('/')[2]+'\n'
 		data+= 'ExecStart=\n'
 		data+= 'ExecStart=/usr/bin/avnav -q -b ' + conf2.home + '/avnav/data -t '+currentdir+'/data/avnav_server.xml\n'
