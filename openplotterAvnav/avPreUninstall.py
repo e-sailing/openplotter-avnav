@@ -64,13 +64,8 @@ def main():
 		subprocess.call(['apt', '-y', 'autoremove', 'avnav-mapproxy-plugin'])
 	except Exception as e: print(_('FAILED: ')+str(e))
 	try:
-		subprocess.call(['apt', '-y', 'autoremove', 'avnav-ocharts-plugin'])
+		subprocess.call(['apt', '-y', 'autoremove', 'avnav-ochartsng'])
 	except Exception as e: print(_('FAILED: ')+str(e))
-	try:
-		subprocess.call(['apt', '-y', 'autoremove', 'avnav-ocharts'])
-		print(_('DONE'))
-	except Exception as e: print(_('FAILED: ')+str(e))
-
 
 	print(_('Removing version...'))
 	try:
